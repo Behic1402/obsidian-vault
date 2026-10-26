@@ -22,5 +22,6 @@ aktualisiert: 2026-10-26
 ## Ziele
 
 ## Verweise
+- Index: [[_Index]]
 - Projekte: [[20 Projekte]]
 - Personen: [[30 Personen]]
