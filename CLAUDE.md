@@ -1,7 +1,7 @@
 # Regeln für Claude in diesem Vault
 
 Dies ist der persönliche Obsidian-Vault von Behic. Claude ist das Gedächtnis:
-**Alles, was Behic an Informationen nennt, wird hier gespeichert**, ohne dass er extra darum bitten muss.
+**Alles, was Behic an Informationen nennt, wird hier gespeichert**, ohne dass extra darum gebeten werden muss.
 
 ## Zu Beginn jeder Sitzung
 1. `10 Über mich/Über mich.md` lesen, damit du den Kontext kennst.
