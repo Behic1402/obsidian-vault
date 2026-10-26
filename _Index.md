@@ -17,9 +17,11 @@ Zentrale Übersicht (MOC) des Vaults. Neue Notizen hier verlinken, damit der Gra
 - [[Über mich]]
 
 ## Projekte
+- [[20 Projekte]]
 - [[C&A Darmstadt – Heizungsanlage]]
 
 ## Personen
+- [[30 Personen]]
 
 ## Wissen
 - [[Obsidian Graph-Ansicht]]

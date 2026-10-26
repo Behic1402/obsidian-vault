@@ -11,7 +11,7 @@ aktualisiert: 2026-10-26
 
 # Obsidian Graph-Ansicht
 
-Die Graph-Ansicht zeigt alle Notizen als Punkte und die [[Wikilinks]] zwischen ihnen als Linien.
+Die Graph-Ansicht zeigt alle Notizen als Punkte und die `[[Wikilinks]]` zwischen ihnen als Linien.
 
 ## Öffnen
 - Linke Seitenleiste: Symbol **„Graph-Ansicht öffnen“** (drei verbundene Punkte)
