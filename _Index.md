@@ -25,6 +25,7 @@ Zentrale Übersicht (MOC) des Vaults. Neue Notizen hier verlinken, damit der Gra
 
 ## Wissen
 - [[Obsidian Graph-Ansicht]]
+- [[Claude Skills Übersicht]]
 
 ## Journal
 
