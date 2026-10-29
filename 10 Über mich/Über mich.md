@@ -4,7 +4,7 @@ tags:
 aliases:
   - Profil
 erstellt: 2026-10-26
-aktualisiert: 2026-10-26
+aktualisiert: 2026-10-29
 ---
 
 # Über mich
@@ -20,6 +20,7 @@ aktualisiert: 2026-10-26
 ## Vorlieben
 
 ## Ziele
+- Interesse an automatisiertem Trading (Idee: ~1000 € über Trade Republic von einem Programm investieren lassen) → [[Trading-Bot und Trade Republic]]
 
 ## Verweise
 - Index: [[_Index]]
