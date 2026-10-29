@@ -26,5 +26,12 @@ Idee von Behic (2026-10-29): Ein Programm soll ~1000 € auf dem Trade-Republic-
 4. Anfangs nur Vorschläge per Benachrichtigung, Freigabe von Hand.
 5. Steuer: Gewinne (Abgeltungsteuer) und Dokumentation beachten.
 
+## Broker mit offizieller API (Stand Wissen 2026, vor Nutzung prüfen)
+- **Interactive Brokers (IBKR)**: ausgereifte offizielle API (TWS API, Web API), Paper-Trading-Konto, für Deutsche verfügbar, günstige Gebühren. Nachteil: komplexer; deutsche Steuer wird nicht automatisch abgeführt, Erklärung selbst in der Steuererklärung.
+- **Trading 212**: öffentliche API (Beta), einfacher; Umfang und Verfügbarkeit für Deutschland prüfen.
+- **Alpaca**: API-first, Paper-Trading, aber US-Aktien; Zugang für Kunden aus Deutschland prüfen.
+- **Krypto** (Kraken, Binance, Bitpanda): gute APIs, aber ganz anderes Risikoprofil.
+- Ohne offizielle API (wie Trade Republic): Scalable, DEGIRO, flatex, comdirect u. a.
+
 ## Verweise
 - [[Über mich]]
