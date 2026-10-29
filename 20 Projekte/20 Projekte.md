@@ -4,7 +4,7 @@ tags:
 aliases:
   - Projekte
 erstellt: 2026-10-26
-aktualisiert: 2026-10-26
+aktualisiert: 2026-10-29
 ---
 
 # Projekte
@@ -13,3 +13,4 @@ Zurück zum [[_Index]]
 
 - [[C&A Darmstadt – Heizungsanlage]]
 - [[Haushaltsrechner und Haussparen]]
+- [[Clean Your TV]]
