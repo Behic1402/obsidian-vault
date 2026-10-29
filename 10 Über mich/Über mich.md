@@ -18,6 +18,7 @@ aktualisiert: 2026-10-29
 - Werkzeuge: Claude (Skills: grilling, humanizer, find-skills, Obsidian-Skills), Obsidian
 
 ## Vorlieben
+- Hat bereits ein Profil bei Interactive Brokers (IBKR), Stand 2026-10-29 (keine Zugangsdaten gespeichert) → [[Trading-Bot und Trade Republic]]
 - Macht Steuererklärung ohnehin; Broker ohne automatische Steuerabführung (z. B. IBKR) sind für ihn okay → [[Trading-Bot und Trade Republic]]
 
 ## Ziele
