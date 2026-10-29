@@ -18,6 +18,7 @@ aktualisiert: 2026-10-29
 - Werkzeuge: Claude (Skills: grilling, humanizer, find-skills, Obsidian-Skills), Obsidian
 
 ## Vorlieben
+- Macht Steuererklärung ohnehin; Broker ohne automatische Steuerabführung (z. B. IBKR) sind für ihn okay → [[Trading-Bot und Trade Republic]]
 
 ## Ziele
 - Interesse an automatisiertem Trading (Idee: ~1000 € über Trade Republic von einem Programm investieren lassen) → [[Trading-Bot und Trade Republic]]
