@@ -60,6 +60,13 @@ Nichts gefunden, das einen deutschen EFH-Entwurf prüft. Inhalt eines eigenen Sk
 > [!warning] Bauantrag
 > In NRW muss den Bauantrag ein bauvorlageberechtigter Entwurfsverfasser (Architekt/berechtigter Ingenieur) unterschreiben. Claude-Entwürfe sind Vorplanung/Ideen.
 
+## Stand beim Packen (2026-10-30)
+- `markdown-viewer/skills` hat den Einzel-Skill floor-plan in **documd-visuals** zusammengeführt (PlantUML-Floorplan-Stencils).
+- PyPI-Paket für ifcmcp heißt **ifcopenshell-mcp** (`uv tool install "ifcopenshell-mcp[mcp]"`, Befehl `ifcmcp`).
+- `spkane/freecad-mcp` nicht mehr erreichbar → **neka-nat/freecad-mcp** (`uvx freecad-mcp`).
+- BlenderMCP heißt auf PyPI **mcp-for-blender**.
+- Klotzkette-Skill „bauantrag-…“ ist inhaltlich Bürokratieabbau, nicht Bauantrag → stattdessen `festsetzungen-bebauungsplan-baugenehmigung-praxis`.
+
 ## Quellen
 - https://github.com/markdown-viewer/skills
 - https://github.com/AlpacaLabsLLC/skills-for-architects
