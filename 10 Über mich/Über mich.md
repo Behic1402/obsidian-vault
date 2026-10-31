@@ -15,6 +15,7 @@ aktualisiert: 2026-10-31
 ## Basis
 - Name: Behic
 - Sprache: Deutsch
+- Arbeitet in einer Apotheke (Filiale), Stand 2026-10-31 → [[Urlaubsplanung Apotheke]]
 - Werkzeuge: Claude (Skills: grilling, humanizer, find-skills, Obsidian-Skills, Arena → [[Arena-Skill]]), Obsidian
 
 ## Vorlieben
