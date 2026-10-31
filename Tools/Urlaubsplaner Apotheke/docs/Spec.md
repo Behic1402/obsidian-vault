@@ -56,7 +56,9 @@ Abwesende sind Personen, die laut Standardplan gearbeitet hätten und eine Abwes
 
 ## 7. Vorbefüllung aus der Übergabe
 Personal und Rhythmen laut Übergabe-Datei (Maren, Katja, Malte, Tomke; Marion B., Jutta, Marion I., Anja, Rama, Nick; PhiP inaktiv ohne Plan). Tomke-„Büro" = `Homeoffice`; Ramas Laborzeiten werden nicht eingetragen (nur Samstag W4/W8). Die Zeiten bei „ca." sind Startwerte, per UI änderbar. Ramas Samstag (W4/W8): Uhrzeit nicht genannt, Startwert Sa 09:00–13:00, „unbestätigt". Nick: Mo/Di/Do 09:00–18:00, Mi 09:00–18:00 (nicht in W3/W7), Fr 10:00–18:00, Sa 09:00–13:00. Anja: Mi 09:00–13:00, Do 08:00–13:00, Fr 08:00–18:00, Sa 08:45–13:00. Marion I.: Mo 07:45–13:00, Di 08:00–13:00, Mi 08:00–18:30, Fr 08:00–13:00, Sa 08:45–13:15. Katja: Fr frei in W2/W6, Sa in W1/W5. Maren: Sa in W2/W6. Malte: Di frei W1, Sa in W4/W8. Tomke: Di Homeoffice W2/W6, Di frei W7, Sa in W3/W7.
-Apotheker-Tage ohne Uhrzeiten in der Übergabe (nur Wochentage): Es werden Platzhalterzeiten verwendet (Mo–Fr 08:00–19:00, Sa 09:00–13:30) und im UI als „Zeit unbestätigt" markiert, damit Behic sie korrigiert.
+**Apotheker-Zeiten** (aus Blatt „Urlaubsplanung Vorlage" der Excel-Datei, Stand Behic): Mo: Tomke 8–14 & 15–18, Katja 8–13 & 14–19. Di: Malte 9–12 & 13–19, Tomke 8–13 & 14–19, Katja 8–13. Mi: Malte 9–12 & 13–19, Katja 8–13 & 14–18:30. Do: Maren 8–14 & 15–19, Tomke 8–13 & 14–18. Fr: Maren 8–13, Tomke 8–13 & 14–19, Katja 9–14. Sa: ein Apotheker 9–13:30. Mit der Überlappungsregel ergibt das dieselben Blöcke wie der bisherige Standardplan (Gegenprobe im Test). Die Zeiten sind damit **bestätigt**, kein Warnbanner nötig.
+
+**Import aus der Excel-Datei:** Die App kann das Blatt `Abwesenheiten` (Datum, Name, Grund, Genehmigt?) einlesen. Die 378 Abwesenheiten aus 2026 werden **nicht** ins Repository eingebettet (Datenschutz), sondern von Behic im Browser importiert. Gründe wie „PBU", „ÜS-Ausgleich" werden als eigene Art geführt; unbekannte Gründe werden als Art „Sonstiges" mit Originaltext in der Notiz übernommen. Die Laborspalten (Karina/Hossin/WUNSCH) werden ignoriert.
 
 ## 8. Technik
 Eine HTML-Datei mit eingebettetem CSS/JS, kein Build. Kern-Logik (Rollierung, Besetzung, Resturlaub) als reine Funktionen in einem getrennten Abschnitt, damit sie per Node-Skript testbar sind. Excel-Export über eine eingebettete SheetJS-Kopie (offline). Tests: Node-Skript `tests/logik.test.js` ohne Frameworks.
@@ -68,10 +70,11 @@ Eine HTML-Datei mit eingebettetem CSS/JS, kein Build. Kern-Logik (Rollierung, Be
 - Import/Export: Roundtrip JSON.
 
 ## 10. Annahmen / offen
+- Abwesenheitsarten aus der Datei: Urlaub, PBU, ÜS-Ausgleich, ÜS-frei, Sonstiges (+ Krank, Fortbildung).
 - Apotheker-Rollierung bei Feiertagssamstag (Folgewoche wiederholt die Rollwoche, Apotheker liegt danach eine Woche hinter PTA): durch Behics Beschreibung („dieselbe KW kann für PTA W5, für Apotheker W4 sein") bestätigt.
 - Überlappung > 0 Minuten reicht für Anwesenheit im Block.
 - Urlaubsanspruch pro Person fehlt noch.
-- Apotheker-Arbeitszeiten (Uhrzeiten) fehlen in der Übergabe: Platzhalter ganztägig würden Unterbesetzung verdecken; die App zeigt deshalb ein Warnbanner, solange Zeiten „unbestätigt" sind. **Behic liefert die echten Zeiten.**
+- Apotheker-Zeiten: aus der Excel-Vorlage übernommen (siehe 7).
 - Fehlende Regel-Werte trägt Behic ein.
 
 ## 11. Primärer Zweck (Behic)

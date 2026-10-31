@@ -47,7 +47,7 @@ Mo–Fr: 08:00–08:30 2/1 · 08:30–12:00 4/1 · 12:00–15:00 2/1 · 15:00–
 - Apotheker-Rollierung: Feiertagssamstag verschiebt nur Apotheker (eine Woche Verzug), PTA starr.
 
 ## Offen
-- [ ] Uhrzeiten der Apotheker (Maren, Katja, Malte, Tomke)
-- [ ] Excel-Datei optional bereitstellen
+- [x] Uhrzeiten der Apotheker (aus Excel-Vorlage übernommen)
+- [x] Excel-Datei erhalten (2026-10-31)
 - [ ] Urlaubsanspruch pro Person (für Resturlaub)
 - [ ] Bundesland bestätigen (Übergabe nennt NRW)
