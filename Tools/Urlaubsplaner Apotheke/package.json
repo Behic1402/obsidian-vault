@@ -1,0 +1,1 @@
+{"private":true,"name":"urlaubsplaner-apotheke","scripts":{"test":"node --test tests/*.test.js","build":"node build.js"}}
