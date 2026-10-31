@@ -38,8 +38,16 @@ Tool für die Arbeit in der Apotheke (Filiale): Urlaube/Abwesenheiten eintragen 
 - PhiP 2027: noch unbekannt, vorbereitet mit Aktiv = nein
 - Detaillierte W1–W8-Matrix und Arbeitszeiten stehen in der Übergabe-Datei (Behic hat sie freigegeben).
 
+## Regeln Mindestbesetzung (von Behic, 2026-10-31)
+Mo–Fr: 08:00–08:30 2/1 · 08:30–12:00 4/1 · 12:00–15:00 2/1 · 15:00–18:00 3/1 · 18:00–18:30 2/1 · 18:30–19:00 1 (approbiert). Sa: 09:00–13:00 3/1 · 13:00–13:30 1 (approbiert). (Personen/davon approbiert.)
+
+## Entscheidungen Tool
+- Form: Web-App (eine HTML-Datei) mit Excel-Export, Daten lokal, Spec: `Tools/Urlaubsplaner Apotheke/docs/Spec.md`.
+- Hauptzweck: schnell prüfen, ob beantragter Urlaub zu Unterbesetzung führt.
+- Apotheker-Rollierung: Feiertagssamstag verschiebt nur Apotheker (eine Woche Verzug), PTA starr.
+
 ## Offen
-- [ ] Excel-Datei bereitstellen
-- [ ] Form des Tools festlegen (Web-App vs. Excel-Erweiterung)
+- [ ] Uhrzeiten der Apotheker (Maren, Katja, Malte, Tomke)
+- [ ] Excel-Datei optional bereitstellen
 - [ ] Urlaubsanspruch pro Person (für Resturlaub)
 - [ ] Bundesland bestätigen (Übergabe nennt NRW)

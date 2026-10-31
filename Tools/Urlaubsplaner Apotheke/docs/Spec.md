@@ -21,7 +21,15 @@ Keine Logins, kein Server, keine Mehrbenutzer-Bearbeitung, keine Zeiterfassung, 
 - `personal[]`: name, rolle (Apotheker/in, PTA, PTA-Praktikant, PhiP), approbiert, rollgruppe (Apotheker|PTA), aktiv, zaehltMindestbesetzung, urlaubsanspruchTage (Zahl, leer = unbekannt), hinweis.
 - `standardplan[]`: personName, rollwoche (1–8), wochentag (Mo–Sa), von, bis, ort (`Filiale` | `Homeoffice` | `Labor`). Nur `Filiale` zählt für die Besetzung.
 - `bloecke[]`: tagTyp (Mo–Fr | Sa), von, bis. Standard: Mo–Fr 08:00–08:30, 08:30–12:00, 12:00–15:00, 15:00–18:00, 18:00–18:30, 18:30–19:00; Sa 09:00–13:00, 13:00–13:30. Editierbar.
-- `regeln[]`: wochentag, block, minPersonen, minApprobierte. Leer/fehlend wird als „Regel fehlt" angezeigt, nie geraten. Vorbefüllt nur die drei bekannten Beispiele (Mo 08:30–12:00 → 4/1; Sa 09:00–13:00 → 3/1; Sa 13:00–13:30 → 0/1).
+- `regeln[]`: wochentag, block, minPersonen, minApprobierte, `nurApprobiert` (alle Anwesenden müssen approbiert sein). Fehlende Regeln werden als „Regel fehlt" angezeigt, nie geraten. **Vorbefüllt laut Behic (2026-10-31):**
+  - Mo–Fr 08:00–08:30: 2 Personen, 1 approbiert
+  - Mo–Fr 08:30–12:00: 4 Personen, 1 approbiert
+  - Mo–Fr 12:00–15:00: 2 Personen, 1 approbiert
+  - Mo–Fr 15:00–18:00: 3 Personen, 1 approbiert
+  - Mo–Fr 18:00–18:30: 2 Personen, 1 approbiert
+  - Mo–Fr 18:30–19:00: 1 Person, muss approbiert sein
+  - Sa 09:00–13:00: 3 Personen, 1 approbiert (Ziel: 1 Apotheker + 2 PTA/PhiP/Praktikant)
+  - Sa 13:00–13:30: 1 Person, muss approbiert sein
 - `abwesenheiten[]`: datum (ISO), name, art (Urlaub|Krank|Fortbildung|Sonstiges), genehmigt (ja/nein), notiz. Pro Tag und Person ein Eintrag; Zeiträume werden beim Eintragen auf Tage aufgelöst.
 - `rollierung`: startdatum `2026-12-28` (= W1) und `feiertagssamstage[]` (vorbefüllt: 2027-05-01, 2027-12-25, 2028-01-01).
 - `feiertage[]`: Datum + Name (NRW), vorbefüllt für 2027 und 2028, editierbar. Feiertage Mo–Fr sind in den Quelldaten nicht geregelt; sie werden im Kalender markiert und beim Resturlaub nicht gezählt, die Besetzungsregeln bleiben unverändert.
@@ -47,7 +55,7 @@ Abwesende sind Personen, die laut Standardplan gearbeitet hätten und eine Abwes
 7. **Daten**: JSON-Sicherung exportieren/importieren, Excel-Export (Wochenplan, Jahresübersicht, Abwesenheiten), PDF/Druckansicht.
 
 ## 7. Vorbefüllung aus der Übergabe
-Personal und Rhythmen laut Übergabe-Datei (Maren, Katja, Malte, Tomke; Marion B., Jutta, Marion I., Anja, Rama, Nick; PhiP inaktiv ohne Plan). Tomke-„Büro" = `Homeoffice`; Ramas Laborzeiten werden nicht eingetragen (nur Samstag W4/W8). Die Zeiten bei „ca." sind Startwerte, per UI änderbar.
+Personal und Rhythmen laut Übergabe-Datei (Maren, Katja, Malte, Tomke; Marion B., Jutta, Marion I., Anja, Rama, Nick; PhiP inaktiv ohne Plan). Tomke-„Büro" = `Homeoffice`; Ramas Laborzeiten werden nicht eingetragen (nur Samstag W4/W8). Die Zeiten bei „ca." sind Startwerte, per UI änderbar. Ramas Samstag (W4/W8): Uhrzeit nicht genannt, Startwert Sa 09:00–13:00, „unbestätigt". Nick: Mo/Di/Do 09:00–18:00, Mi 09:00–18:00 (nicht in W3/W7), Fr 10:00–18:00, Sa 09:00–13:00. Anja: Mi 09:00–13:00, Do 08:00–13:00, Fr 08:00–18:00, Sa 08:45–13:00. Marion I.: Mo 07:45–13:00, Di 08:00–13:00, Mi 08:00–18:30, Fr 08:00–13:00, Sa 08:45–13:15. Katja: Fr frei in W2/W6, Sa in W1/W5. Maren: Sa in W2/W6. Malte: Di frei W1, Sa in W4/W8. Tomke: Di Homeoffice W2/W6, Di frei W7, Sa in W3/W7.
 Apotheker-Tage ohne Uhrzeiten in der Übergabe (nur Wochentage): Es werden Platzhalterzeiten verwendet (Mo–Fr 08:00–19:00, Sa 09:00–13:30) und im UI als „Zeit unbestätigt" markiert, damit Behic sie korrigiert.
 
 ## 8. Technik
@@ -60,8 +68,11 @@ Eine HTML-Datei mit eingebettetem CSS/JS, kein Build. Kern-Logik (Rollierung, Be
 - Import/Export: Roundtrip JSON.
 
 ## 10. Annahmen / offen
-- Apotheker-Rollierung bei Feiertagssamstag (Folgewoche wiederholt die Rollwoche): **Behic bestätigt**.
+- Apotheker-Rollierung bei Feiertagssamstag (Folgewoche wiederholt die Rollwoche, Apotheker liegt danach eine Woche hinter PTA): durch Behics Beschreibung („dieselbe KW kann für PTA W5, für Apotheker W4 sein") bestätigt.
 - Überlappung > 0 Minuten reicht für Anwesenheit im Block.
 - Urlaubsanspruch pro Person fehlt noch.
 - Apotheker-Arbeitszeiten (Uhrzeiten) fehlen in der Übergabe: Platzhalter ganztägig würden Unterbesetzung verdecken; die App zeigt deshalb ein Warnbanner, solange Zeiten „unbestätigt" sind. **Behic liefert die echten Zeiten.**
 - Fehlende Regel-Werte trägt Behic ein.
+
+## 11. Primärer Zweck (Behic)
+Schnell sehen, ob eine **beantragte Abwesenheit** in einer bestimmten Woche zu Unterbesetzung führt. Deshalb: Wochenprüfung ist Startseite, Woche per KW/Datum wählbar, und beim Eintragen einer Abwesenheit sofortige Auswirkungs-Warnung. Resturlaub ist nachrangig (optional).
