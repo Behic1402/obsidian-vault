@@ -4,7 +4,7 @@ tags:
 aliases:
   - Profil
 erstellt: 2026-10-26
-aktualisiert: 2026-10-29
+aktualisiert: 2026-10-31
 ---
 
 # Über mich
@@ -15,7 +15,7 @@ aktualisiert: 2026-10-29
 ## Basis
 - Name: Behic
 - Sprache: Deutsch
-- Werkzeuge: Claude (Skills: grilling, humanizer, find-skills, Obsidian-Skills), Obsidian
+- Werkzeuge: Claude (Skills: grilling, humanizer, find-skills, Obsidian-Skills, Arena → [[Arena-Skill]]), Obsidian
 
 ## Vorlieben
 - Hat bereits ein Profil bei Interactive Brokers (IBKR), Stand 2026-10-29 (keine Zugangsdaten gespeichert) → [[Trading-Bot und Trade Republic]]
