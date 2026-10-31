@@ -47,7 +47,10 @@ Mo–Fr: 08:00–08:30 2/1 · 08:30–12:00 4/1 · 12:00–15:00 2/1 · 15:00–
 - Apotheker-Rollierung: Feiertagssamstag verschiebt nur Apotheker (eine Woche Verzug), PTA starr.
 
 ## Stand (2026-10-31)
-Web-App gebaut: `Tools/Urlaubsplaner Apotheke/urlaubsplaner.html` (eine Datei, offline, Daten nur lokal im Browser). Quellcode, Tests, Spec und Plan im selben Ordner. Unabhängige Prüfung läuft/folgt. Bedienung: Woche wählen → Ampel je Zeitblock; Abwesenheit eintragen → sofortige Warnung; Excel-Abwesenheiten per Import einlesen.
+Web-App gebaut: `Tools/Urlaubsplaner Apotheke/urlaubsplaner.html` (eine Datei, offline, Daten nur lokal im Browser). Quellcode, Tests, Spec und Plan im selben Ordner. Zwei unabhängige Prüfungen bestanden (9 Funde behoben). Bedienung: Woche wählen → Ampel je Zeitblock; Abwesenheit eintragen → sofortige Warnung; Excel-Abwesenheiten per Import einlesen.
+
+## Hinweis aus Prüfung
+Aus der freigegebenen Matrix folgt: Samstage in W2/W6 haben nur Maren und Anja (2 statt 3 Personen) → immer „Unterbesetzt". Mit Behic klären.
 
 ## Offen
 - [x] Uhrzeiten der Apotheker (aus Excel-Vorlage übernommen)
