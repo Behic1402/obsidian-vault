@@ -29,3 +29,8 @@ test('Export: Wochenplan und Jahr', () => {
   const j = E.exportJahr(L.jahresuebersicht(2027, d));
   assert.equal(j.rows[0].length, 54);
 });
+
+test('Import: Freitext in Spalte „Genehmigt?“ geht nicht verloren', () => {
+  const r = E.parseAbwesenheiten([['2026-02-02', 'Malte', 'ja', 'Urlaub', null, null, null, 'Sophie']], seed());
+  assert.equal(r.eintraege[0].genehmigt, 'ja'); assert.match(r.eintraege[0].notiz, /Sophie/);
+});

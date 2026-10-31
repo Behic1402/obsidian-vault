@@ -38,8 +38,10 @@
       if (gesehen.has(key)) return;
       gesehen.add(key);
       const a = art(r[3]);
-      const gen = String(r[7] == null ? 'ja' : r[7]).trim().toLowerCase();
-      eintraege.push({ datum: iso, name, art: a.art, genehmigt: gen === 'nein' ? 'nein' : 'ja', notiz: a.notiz });
+      const gen = String(r[7] == null ? 'ja' : r[7]).trim();
+      const ja = /^(ja|nein)$/i.test(gen) || gen === '';
+      const notiz = [a.notiz, ja ? '' : 'Genehmigt: ' + gen].filter(Boolean).join(' · ');
+      eintraege.push({ datum: iso, name, art: a.art, genehmigt: gen.toLowerCase() === 'nein' ? 'nein' : 'ja', notiz });
     });
     return { eintraege, unbekannteNamen: [...unbekannte], ignoriert };
   }

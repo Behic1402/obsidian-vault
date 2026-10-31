@@ -79,3 +79,25 @@ test('Abwesenheiten, Urlaubstage, Resturlaub, Jahresübersicht', () => {
   assert.equal(L.jahresuebersicht(2026, d).find((x) => x.name === 'Katja').kws[53], 'U');
   assert.equal(L.jahresuebersicht(2027, d).find((x) => x.name === 'Katja').kws[53], undefined);
 });
+
+test('Regression Prüfbericht: Verschlechterung, nurAppr, Duplikate, Jahresübersicht, KW', () => {
+  const d = seed();
+  // K1: bereits kritischer Block, der schlechter wird, muss gemeldet werden
+  const mAnja = L.auswirkung([{ datum: '2027-01-09', name: 'Anja' }], d);
+  assert.ok(mAnja.some((x) => x.label === '09:00–13:00' && x.vorher === true));
+  const mMaren = L.auswirkung([{ datum: '2027-01-09', name: 'Maren' }], d);
+  assert.ok(mMaren.some((x) => x.label === '09:00–13:00'));
+  // K6: nurAppr wirkt (alle Anwesenden müssen approbiert sein)
+  const r = d.regeln.find((x) => x.tag === 'Mo' && x.von === '15:00');
+  r.minP = 2; r.minA = 1; r.nurAppr = true;
+  const b = L.pruefeTag('2027-01-04', d).bloecke.find((x) => x.label === '15:00–18:00');
+  assert.equal(b.apothekerStatus, b.istA >= 2 ? 'OK' : 'Kein Apotheker');
+  // K7: Duplikate aus JSON zählen nicht doppelt, Jahresübersicht nach Datum
+  d.abwesenheiten.push({ datum: '2027-01-06', name: 'Anja', art: 'Urlaub' }, { datum: '2027-01-06', name: 'Anja', art: 'Urlaub' });
+  assert.equal(L.urlaubstage('Anja', 2027, d), 1);
+  d.abwesenheiten.push({ datum: '2027-01-05', name: 'Jutta', art: 'Krank' }, { datum: '2027-01-04', name: 'Jutta', art: 'Urlaub' });
+  assert.equal(L.jahresuebersicht(2027, d).find((x) => x.name === 'Jutta').kws[1], 'U');
+  // K3: KW + Jahr -> Montag
+  assert.equal(L.montagDerKW(2027, 2), '2027-01-11');
+  assert.equal(L.montagDerKW(2026, 53), '2026-12-28');
+});

@@ -1,4 +1,4 @@
-// Browser-Smoketest (Playwright, vorinstalliert): node tests/browser.test.js
+// Browser-Smoketest (Playwright, vorinstalliert): node tests/browser.smoke.js
 const { chromium } = require('playwright');
 const path = require('path'), assert = require('node:assert/strict'), fs = require('fs');
 (async () => {
@@ -18,7 +18,7 @@ const path = require('path'), assert = require('node:assert/strict'), fs = requi
   await p.click('nav button:has-text("Abwesenheiten")');
   await p.selectOption('select[data-f=name]', 'Katja');
   await p.fill('input[data-f=von]', '2027-01-04'); await p.dispatchEvent('input[data-f=von]', 'change');
-  assert.match(await p.textContent('#app'), /Keine zusätzliche Unterbesetzung|führt zu Unterbesetzung/);
+  assert.match(await p.textContent('#app'), /Keine zusätzliche Unterbesetzung|Unterbesetzung/);
   await p.click('button[data-a=abwSpeichern]');
   assert.match(await p.textContent('#app'), /1 Tag\(e\) eingetragen/);
   await p.selectOption('select[data-f=name]', 'Tomke');
@@ -33,6 +33,22 @@ const path = require('path'), assert = require('node:assert/strict'), fs = requi
   await p.locator('input[data-c=pAktiv][data-i="9"]').uncheck();
   await p.click('nav button:has-text("Wochenprüfung")');
   assert.ok(!(await p.textContent('#app')).includes('Nick'));
+  // M2: inhaltlich kaputte Sicherung wird abgelehnt
+  await p.click('nav button:has-text("Daten")');
+  fs.writeFileSync('/tmp/kaputt2.json', JSON.stringify(Object.assign(JSON.parse(await p.evaluate(() => JSON.stringify(window.__urlaubsplaner.d))), { abwesenheiten: [{ datum: '31.12.2027', name: 'Katja' }] })));
+  await p.setInputFiles('input[data-c=jsonImport]', '/tmp/kaputt2.json');
+  await p.waitForSelector('.warnbox');
+  // K3/M1: KW+Jahr, Krank warnt
+  await p.click('nav button:has-text("Wochenprüfung")');
+  await p.fill('input[data-c=kwJahr]', '2027'); await p.dispatchEvent('input[data-c=kwJahr]', 'change');
+  await p.fill('input[data-c=kw]', '2'); await p.dispatchEvent('input[data-c=kw]', 'change');
+  assert.match(await p.textContent('#app'), /KW 2\/2027/);
+  assert.match(await p.textContent('#app'), /Woche: /);
+  await p.click('nav button:has-text("Abwesenheiten")');
+  await p.selectOption('select[data-f=art]', 'Krank');
+  await p.selectOption('select[data-f=name]', 'Katja');
+  await p.fill('input[data-f=von]', '2027-01-11'); await p.dispatchEvent('input[data-f=von]', 'change');
+  assert.match(await p.textContent('.warnbox, .okbox'), /Unterbesetzung/);
   // Reload behält Daten
   await p.reload(); await p.click('nav button:has-text("Abwesenheiten")');
   assert.match(await p.textContent('#app'), /04\.01\.2027/);

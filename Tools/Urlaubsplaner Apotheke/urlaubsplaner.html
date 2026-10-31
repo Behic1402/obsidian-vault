@@ -87,6 +87,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     const neujahr = dayNum(jahr + '-01-01');
     return { jahr, kw: Math.floor((donnerstag - neujahr) / 7) + 1 };
   }
+  const montagDerKW = (jahr, kw) => addTage(montagVon(jahr + '-01-04'), (kw - 1) * 7);
   const anzeigeDatum = (iso) => iso.slice(8) + '.' + iso.slice(5, 7) + '.' + iso.slice(0, 4);
 
   // ---------- Rollierung ----------
@@ -152,7 +153,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       else if (!regel) ps = as = 'Regel fehlt';
       else {
         ps = istP < regel.minP ? 'Unterbesetzt' : 'OK';
-        as = istA < regel.minA ? 'Kein Apotheker' : 'OK';
+        as = istA < (regel.nurAppr ? Math.max(regel.minA, regel.minP) : regel.minA) ? 'Kein Apotheker' : 'OK';
       }
       res.bloecke.push({
         label, minP: regel ? regel.minP : null, minA: regel ? regel.minA : null,
@@ -179,8 +180,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     [...new Set(neue.map((n) => n.datum))].forEach((iso) => {
       const v = pruefeTag(iso, d), n = pruefeTag(iso, nachher);
       n.bloecke.forEach((b, i) => {
-        if (blockProblem(b) && !blockProblem(v.bloecke[i])) {
-          out.push({ datum: iso, label: b.label, status: [b.personalStatus, b.apothekerStatus].filter((s) => s !== 'OK').join(' + ') });
+        const vb = v.bloecke[i];
+        if (blockProblem(b) && (!blockProblem(vb) || b.istP < vb.istP || b.istA < vb.istA)) {
+          out.push({ datum: iso, label: b.label, status: [b.personalStatus, b.apothekerStatus].filter((x) => x !== 'OK').join(' + '),
+            ist: b.istP + '/' + b.istA, vorher: blockProblem(vb) });
         }
       });
     });
@@ -208,9 +211,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   function urlaubstage(name, jahr, d) {
     const p = d.personal.find((x) => x.name === name);
     if (!p) return 0;
-    return d.abwesenheiten.filter((a) =>
+    const tage = new Set(d.abwesenheiten.filter((a) =>
       a.name === name && a.art === 'Urlaub' && a.datum.startsWith(jahr + '-') && wochentag(a.datum) !== 'So' &&
-      !feiertagVon(a.datum, d) && hatPlan(p, a.datum, d)).length;
+      !feiertagVon(a.datum, d) && hatPlan(p, a.datum, d)).map((a) => a.datum));
+    return tage.size;
   }
   function resturlaub(name, jahr, d) {
     const p = d.personal.find((x) => x.name === name);
@@ -221,7 +225,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   function jahresuebersicht(jahr, d) {
     return d.personal.map((p) => {
       const kws = {};
-      d.abwesenheiten.filter((a) => a.name === p.name).forEach((a) => {
+      d.abwesenheiten.filter((a) => a.name === p.name).sort((a, b) => a.datum.localeCompare(b.datum)).forEach((a) => {
         const k = isoKW(a.datum);
         if (k.jahr === jahr && !kws[k.kw]) kws[k.kw] = KUERZEL[a.art] || 'S';
       });
@@ -230,7 +234,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   }
 
   return {
-    TAGE, dayNum, isoFromDayNum, wochentag, montagVon, addTage, isoKW, anzeigeDatum, rollwoche,
+    TAGE, montagDerKW, dayNum, isoFromDayNum, wochentag, montagVon, addTage, isoKW, anzeigeDatum, rollwoche,
     bloeckeFuer, blockLabel, bloeckeVonTag, pruefeTag, pruefeWoche, tagStatus, auswirkung,
     addAbwesenheiten, urlaubstage, resturlaub, jahresuebersicht, feiertagVon, blockProblem, KUERZEL,
   };
@@ -382,8 +386,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       if (gesehen.has(key)) return;
       gesehen.add(key);
       const a = art(r[3]);
-      const gen = String(r[7] == null ? 'ja' : r[7]).trim().toLowerCase();
-      eintraege.push({ datum: iso, name, art: a.art, genehmigt: gen === 'nein' ? 'nein' : 'ja', notiz: a.notiz });
+      const gen = String(r[7] == null ? 'ja' : r[7]).trim();
+      const ja = /^(ja|nein)$/i.test(gen) || gen === '';
+      const notiz = [a.notiz, ja ? '' : 'Genehmigt: ' + gen].filter(Boolean).join(' · ');
+      eintraege.push({ datum: iso, name, art: a.art, genehmigt: gen.toLowerCase() === 'nein' ? 'nein' : 'ja', notiz });
     });
     return { eintraege, unbekannteNamen: [...unbekannte], ignoriert };
   }
@@ -428,6 +434,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     return Daten.seed();
   }
   function gueltig(j) {
+    const iso = (x) => typeof x === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x);
+    const ok = j && Array.isArray(j.abwesenheiten) && Array.isArray(j.personal) && Array.isArray(j.standardplan) && Array.isArray(j.feiertage) && Array.isArray(j.regeln) && Array.isArray(j.bloecke) &&
+      j.abwesenheiten.every((a) => a && iso(a.datum) && typeof a.name === 'string') && j.feiertage.every((f) => f && iso(f.datum)) &&
+      j.personal.every((p) => p && typeof p.name === 'string' && typeof p.rollgruppe === 'string') &&
+      j.standardplan.every((e) => e && typeof e.name === 'string' && Array.isArray(e.wochen) && /^\d{2}:\d{2}$/.test(e.von) && /^\d{2}:\d{2}$/.test(e.bis)) &&
+      j.regeln.every((r) => r && typeof r.tag === 'string' && typeof r.minP === 'number') && j.bloecke.every((b) => b && /^\d{2}:\d{2}$/.test(b.von));
+    if (!ok) return false;
     return j && ['personal', 'standardplan', 'bloecke', 'regeln', 'feiertage', 'abwesenheiten'].every((k) => Array.isArray(j[k])) &&
       j.rollierung && /^\d{4}-\d{2}-\d{2}$/.test(j.rollierung.start) && Array.isArray(j.rollierung.feiertagssamstage);
   }
@@ -437,7 +450,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   const S = { tab: 'woche', d: laden(), meldung: null, form: { name: '', von: '', bis: '', art: 'Urlaub', genehmigt: 'ja', notiz: '' }, planPerson: null, filterName: '', filterJahr: null };
   S.datum = heute() < S.d.rollierung.start ? S.d.rollierung.start : heute();
   S.jahr = +S.datum.slice(0, 4); S.monat = +S.datum.slice(5, 7); S.filterJahr = 0;
-  S.planPerson = (S.d.personal[0] || {}).name || null; S.form.name = S.planPerson || '';
+  S.planPerson = (S.d.personal[0] || {}).name || null; S.form.name = (S.d.personal.find((p) => p.aktiv) || {}).name || '';
 
   const chip = (st) => `<span class="chip ${st === 'OK' ? 's-OK' : st === 'Feiertag' ? 's-Feiertag' : st === 'Regel fehlt' ? 's-Regel' : 's-bad'}">${esc(st)}</span>`;
   const opt = (arr, sel) => arr.map((x) => `<option${x === sel ? ' selected' : ''}>${esc(x)}</option>`).join('');
@@ -453,6 +466,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <button class="btn sec" data-a="wocheMinus">◀ Vorherige</button>
       <label>Datum in der Woche<input type="date" data-c="datum" value="${S.datum}"></label>
       <label>Kalenderwoche<input type="number" data-c="kw" value="${kw.kw}" min="1" max="53"></label>
+      <label>Jahr<input type="number" data-c="kwJahr" value="${kw.jahr}" min="2020" max="2100"></label>
       <button class="btn sec" data-a="wochePlus">Nächste ▶</button>
       <button class="btn sec" data-a="heute">Heute</button></div></div>`;
     h += `<div class="card"><h2>KW ${kw.kw}/${kw.jahr} · ${L.anzeigeDatum(mon)} – ${L.anzeigeDatum(L.addTage(mon, 5))}</h2>`;
@@ -460,10 +474,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       h += `<div class="info">Diese Woche liegt vor dem Rollierungsbeginn (${L.anzeigeDatum(S.d.rollierung.start)}). Es gibt keinen Standardplan, daher keine Prüfung.</div></div>`;
       return h;
     }
-    h += `<p>Rollwoche <b>PTA: W${t0.rollPta}</b> · Rollwoche <b>Apotheker: W${t0.rollApo}</b>${t0.rollPta !== t0.rollApo ? ' <span class="mut">(Apotheker liegt wegen Feiertagssamstag eine Woche zurück)</span>' : ''}</p></div>`;
+    h += `<p>Rollwoche <b>PTA: W${t0.rollPta}</b> · Rollwoche <b>Apotheker: W${t0.rollApo}</b>${t0.rollPta !== t0.rollApo ? ` <span class="mut">(Apotheker liegt wegen Feiertagssamstag${(t0.rollPta - t0.rollApo + 8) % 8 === 1 ? ' eine Woche' : ' ' + ((t0.rollPta - t0.rollApo + 8) % 8) + ' Wochen'} zurück)</span>` : ''}</p></div>`;
+    const gesamt0 = woche.reduce((n, t) => n + (t.feiertag ? 0 : t.bloecke.filter(L.blockProblem).length), 0);
+    h = h.replace(/<\/p><\/div>$/, `</p><p>${gesamt0 ? `<span class="chip s-bad">Woche: ${gesamt0} ${gesamt0 > 1 ? 'Blöcke' : 'Block'} kritisch</span>` : '<span class="chip s-OK">Woche: alles OK</span>'}</p></div>`);
     woche.forEach((t) => {
       const probleme = t.bloecke.filter(L.blockProblem).length;
-      const gesamt = t.feiertag ? chip('Feiertag') : probleme ? `<span class="chip s-bad">${probleme} Block${probleme > 1 ? 'e' : ''} kritisch</span>` : chip('OK');
+      const gesamt = t.feiertag ? chip('Feiertag') : probleme ? `<span class="chip s-bad">${probleme} ${probleme > 1 ? 'Blöcke' : 'Block'} kritisch</span>` : chip('OK');
       h += `<div class="card"><div class="tagkopf"><h3>${t.tag} ${L.anzeigeDatum(t.datum)}</h3>${t.feiertag ? `<span class="mut">${esc(t.feiertag)}</span>` : ''}${gesamt}</div>`;
       h += `<div class="scroll"><table><tr><th>Zeitblock</th><th>Soll P/A</th><th>Ist P/A</th><th>Personal</th><th>Apotheker</th><th>Abwesend</th><th>Anwesend</th></tr>`;
       t.bloecke.forEach((b) => {
@@ -508,7 +524,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   function neueAbwesenheiten() {
     const f = S.form;
     if (!f.name || !f.von) return [];
-    const bis = f.bis && f.bis >= f.von ? f.bis : f.von;
+    if (f.bis && f.bis < f.von) return [];
+    const bis = f.bis || f.von;
     const vorhanden = new Set(S.d.abwesenheiten.map((a) => a.datum + '|' + a.name));
     const out = [];
     for (let n = L.dayNum(f.von); n <= L.dayNum(bis); n++) { const iso = L.isoFromDayNum(n); if (!vorhanden.has(iso + '|' + f.name)) out.push({ datum: iso, name: f.name }); }
@@ -517,7 +534,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   function tabAbw() {
     const f = S.form;
     let h = meldungHtml() + `<div class="card"><h2>Abwesenheit eintragen</h2><div class="row">
-      <label>Person<select data-f="name">${namenOpt(f.name, false)}</select></label>
+      <label>Person<select data-f="name">${namenOpt(f.name, true)}</select></label>
       <label>Von<input type="date" data-f="von" value="${f.von}"></label>
       <label>Bis<input type="date" data-f="bis" value="${f.bis}"></label>
       <label>Art<select data-f="art">${opt(ARTEN, f.art)}</select></label>
@@ -525,10 +542,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <label>Notiz<input data-f="notiz" value="${esc(f.notiz)}"></label>
       <button class="btn" data-a="abwSpeichern">Eintragen</button></div>`;
     const neu = neueAbwesenheiten();
-    if (neu.length && f.art !== 'Krank') {
+    if (f.bis && f.bis < f.von) h += '<div class="warnbox">Das Enddatum liegt vor dem Startdatum.</div>';
+    else if (neu.length) {
       const eff = L.auswirkung(neu, S.d);
       h += eff.length
-        ? `<div class="warnbox"><b>Achtung: Diese Abwesenheit führt zu Unterbesetzung</b> (${eff.length} Block${eff.length > 1 ? 'e' : ''}):<ul>${eff.slice(0, 20).map((e) => `<li>${L.wochentag(e.datum)} ${L.anzeigeDatum(e.datum)}, ${e.label}: ${esc(e.status)}</li>`).join('')}</ul></div>`
+        ? `<div class="warnbox"><b>Achtung: Diese Abwesenheit führt zu (zusätzlicher) Unterbesetzung</b> (${eff.length} ${eff.length > 1 ? 'Blöcke' : 'Block'}):<ul>${eff.slice(0, 20).map((e) => `<li>${L.wochentag(e.datum)} ${L.anzeigeDatum(e.datum)}, ${e.label}: ${esc(e.status)} (Ist ${e.ist}${e.vorher ? ', war schon kritisch und wird schlechter' : ''})</li>`).join('')}</ul></div>`
         : `<div class="okbox">Keine zusätzliche Unterbesetzung durch diese Abwesenheit (${neu.length} Tag${neu.length > 1 ? 'e' : ''}).</div>`;
     }
     h += `<p class="small mut">Die Prüfung läuft sofort beim Ausfüllen. Wochenenden werden mit gespeichert und zählen nur, wenn die Person an dem Tag laut Standardplan arbeitet.</p></div>`;
@@ -546,7 +564,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
   // ---------- Personal ----------
   function tabPersonal() {
-    let h = meldungHtml() + `<div class="card"><h2>Personal</h2><p class="small mut">„Aktiv = nein“ nimmt die Person komplett aus Prüfung und Listen, der Standardplan bleibt erhalten. Resturlaub = Anspruch minus Urlaubstage ${S.jahr} (nur Tage, an denen die Person laut Standardplan arbeitet, ohne Feiertage).</p>
+    let h = meldungHtml() + `<div class="card"><h2>Personal</h2><p class="small mut">„Aktiv = nein“ nimmt die Person komplett aus Prüfung und Listen, der Standardplan bleibt erhalten. Resturlaub = Anspruch minus Urlaubstage ${S.jahr} (vor dem Rollierungsbeginn ${L.anzeigeDatum(S.d.rollierung.start)} gibt es keinen Standardplan, dort werden keine Urlaubstage gezählt) (nur Tage, an denen die Person laut Standardplan arbeitet, ohne Feiertage).</p>
       <div class="scroll"><table><tr><th>Name</th><th>Rolle</th><th>Approbiert</th><th>Rollgruppe</th><th>Aktiv</th><th>Zählt Mindestbesetzung</th><th>Anspruch ${S.jahr} (Tage)</th><th>Genommen</th><th>Rest</th><th>Hinweis</th><th></th></tr>`;
     S.d.personal.forEach((p, i) => {
       const rest = L.resturlaub(p.name, S.jahr, S.d);
@@ -673,7 +691,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   };
   const C = {
     datum: (el) => { if (el.value) { S.datum = el.value; render(); } },
-    kw: (el) => { const kw = +el.value; if (kw >= 1 && kw <= 53) { const mon = L.montagVon(S.datum), cur = L.isoKW(mon); S.datum = L.addTage(mon, (kw - cur.kw) * 7); render(); } },
+    kw: (el) => { const kw = +el.value, j = L.isoKW(S.datum).jahr; if (kw >= 1 && kw <= 53) { S.datum = L.montagDerKW(j, kw); render(); } },
+    kwJahr: (el) => { const j = +el.value; if (j >= 2020 && j <= 2100) { S.datum = L.montagDerKW(j, Math.min(L.isoKW(S.datum).kw, 52)); render(); } },
     jahr: (el) => { if (+el.value >= 2020) { S.jahr = +el.value; render(); } },
     filterJahr: (el) => { S.filterJahr = +el.value; render(); }, filterName: (el) => { S.filterName = el.value; render(); },
     planPerson: (el) => { S.planPerson = el.value; render(); },

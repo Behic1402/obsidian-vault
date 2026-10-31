@@ -28,6 +28,7 @@
     const neujahr = dayNum(jahr + '-01-01');
     return { jahr, kw: Math.floor((donnerstag - neujahr) / 7) + 1 };
   }
+  const montagDerKW = (jahr, kw) => addTage(montagVon(jahr + '-01-04'), (kw - 1) * 7);
   const anzeigeDatum = (iso) => iso.slice(8) + '.' + iso.slice(5, 7) + '.' + iso.slice(0, 4);
 
   // ---------- Rollierung ----------
@@ -93,7 +94,7 @@
       else if (!regel) ps = as = 'Regel fehlt';
       else {
         ps = istP < regel.minP ? 'Unterbesetzt' : 'OK';
-        as = istA < regel.minA ? 'Kein Apotheker' : 'OK';
+        as = istA < (regel.nurAppr ? Math.max(regel.minA, regel.minP) : regel.minA) ? 'Kein Apotheker' : 'OK';
       }
       res.bloecke.push({
         label, minP: regel ? regel.minP : null, minA: regel ? regel.minA : null,
@@ -120,8 +121,10 @@
     [...new Set(neue.map((n) => n.datum))].forEach((iso) => {
       const v = pruefeTag(iso, d), n = pruefeTag(iso, nachher);
       n.bloecke.forEach((b, i) => {
-        if (blockProblem(b) && !blockProblem(v.bloecke[i])) {
-          out.push({ datum: iso, label: b.label, status: [b.personalStatus, b.apothekerStatus].filter((s) => s !== 'OK').join(' + ') });
+        const vb = v.bloecke[i];
+        if (blockProblem(b) && (!blockProblem(vb) || b.istP < vb.istP || b.istA < vb.istA)) {
+          out.push({ datum: iso, label: b.label, status: [b.personalStatus, b.apothekerStatus].filter((x) => x !== 'OK').join(' + '),
+            ist: b.istP + '/' + b.istA, vorher: blockProblem(vb) });
         }
       });
     });
@@ -149,9 +152,10 @@
   function urlaubstage(name, jahr, d) {
     const p = d.personal.find((x) => x.name === name);
     if (!p) return 0;
-    return d.abwesenheiten.filter((a) =>
+    const tage = new Set(d.abwesenheiten.filter((a) =>
       a.name === name && a.art === 'Urlaub' && a.datum.startsWith(jahr + '-') && wochentag(a.datum) !== 'So' &&
-      !feiertagVon(a.datum, d) && hatPlan(p, a.datum, d)).length;
+      !feiertagVon(a.datum, d) && hatPlan(p, a.datum, d)).map((a) => a.datum));
+    return tage.size;
   }
   function resturlaub(name, jahr, d) {
     const p = d.personal.find((x) => x.name === name);
@@ -162,7 +166,7 @@
   function jahresuebersicht(jahr, d) {
     return d.personal.map((p) => {
       const kws = {};
-      d.abwesenheiten.filter((a) => a.name === p.name).forEach((a) => {
+      d.abwesenheiten.filter((a) => a.name === p.name).sort((a, b) => a.datum.localeCompare(b.datum)).forEach((a) => {
         const k = isoKW(a.datum);
         if (k.jahr === jahr && !kws[k.kw]) kws[k.kw] = KUERZEL[a.art] || 'S';
       });
@@ -171,7 +175,7 @@
   }
 
   return {
-    TAGE, dayNum, isoFromDayNum, wochentag, montagVon, addTage, isoKW, anzeigeDatum, rollwoche,
+    TAGE, montagDerKW, dayNum, isoFromDayNum, wochentag, montagVon, addTage, isoKW, anzeigeDatum, rollwoche,
     bloeckeFuer, blockLabel, bloeckeVonTag, pruefeTag, pruefeWoche, tagStatus, auswirkung,
     addAbwesenheiten, urlaubstage, resturlaub, jahresuebersicht, feiertagVon, blockProblem, KUERZEL,
   };
