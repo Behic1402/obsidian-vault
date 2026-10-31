@@ -19,6 +19,7 @@ Zentrale Übersicht (MOC) des Vaults. Neue Notizen hier verlinken, damit der Gra
 ## Projekte
 - [[20 Projekte]]
 - [[C&A Darmstadt – Heizungsanlage]]
+- [[Urlaubsplanung Apotheke]]
 
 ## Personen
 - [[30 Personen]]
