@@ -1,0 +1,30 @@
+:root{--bg:#f5f6f8;--card:#fff;--tx:#1d2733;--mut:#667085;--line:#d9dee5;--pri:#0b6e4f;--ok:#1b7f3b;--okbg:#e4f5e8;--warn:#b42318;--warnbg:#fde8e6;--fei:#7a5af8;--feibg:#eeeafe;--leer:#98a2b3}
+*{box-sizing:border-box}body{margin:0;font:15px/1.4 system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--tx)}
+header{background:var(--pri);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+header h1{font-size:18px;margin:0}nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{background:transparent;color:#fff;border:0;padding:8px 12px;border-radius:6px;cursor:pointer;font:inherit}
+nav button.on{background:#fff;color:var(--pri);font-weight:600}
+main{padding:16px;max-width:1280px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:14px}
+h2{font-size:17px;margin:0 0 8px}h3{font-size:15px;margin:0}
+table{border-collapse:collapse;width:100%}th,td{border-bottom:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--mut);font-weight:600;text-transform:uppercase}
+input,select,textarea,button{font:inherit}input,select,textarea{border:1px solid var(--line);border-radius:6px;padding:5px 7px;background:#fff}
+input[type=number]{width:72px}.btn{background:var(--pri);color:#fff;border:0;border-radius:6px;padding:7px 12px;cursor:pointer}
+.btn.sec{background:#fff;color:var(--pri);border:1px solid var(--pri)}.btn.del{background:#fff;color:var(--warn);border:1px solid var(--warn);padding:2px 8px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.row label{display:flex;flex-direction:column;font-size:12px;color:var(--mut);gap:2px}
+.chip{display:inline-block;border-radius:999px;padding:1px 9px;font-size:12px;font-weight:600;white-space:nowrap}
+.s-OK{background:var(--okbg);color:var(--ok)}.s-bad{background:var(--warnbg);color:var(--warn)}.s-Feiertag{background:var(--feibg);color:var(--fei)}.s-Regel{background:#fff4d6;color:#8a5a00}
+.tagkopf{display:flex;gap:10px;align-items:center;margin-bottom:6px}.tagkopf .chip{margin-left:auto}
+.warnbox{background:var(--warnbg);border:1px solid var(--warn);color:var(--warn);border-radius:8px;padding:8px 12px;margin:8px 0}
+.okbox{background:var(--okbg);border:1px solid var(--ok);color:var(--ok);border-radius:8px;padding:8px 12px;margin:8px 0}
+.info{background:#eef4ff;border:1px solid #b2ccff;color:#1d3d7a;border-radius:8px;padding:8px 12px;margin:8px 0}
+.mut{color:var(--mut)}.small{font-size:12px}
+.kal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.kal .kh{font-size:12px;color:var(--mut);text-align:center}
+.kal .z{background:#fff;border:1px solid var(--line);border-radius:6px;min-height:78px;padding:3px 5px;cursor:pointer;font-size:12px}
+.kal .z.warn{border-color:var(--warn);background:var(--warnbg)}.kal .z.feiertag{background:var(--feibg)}.kal .z.out{opacity:.4}.kal .z.sa,.kal .z.so{background:#fafafa}
+.pill{display:inline-block;border-radius:4px;padding:0 4px;margin:1px 1px 0 0;color:#fff;font-size:11px}
+.a-Urlaub{background:#2e90fa}.a-Krank{background:#f79009}.a-Fortbildung{background:#7a5af8}.a-PBU{background:#0e9384}.a-ÜS-Ausgleich,.a-ÜS-frei{background:#667085}.a-Sonstiges{background:#c11574}
+.jt td,.jt th{text-align:center;padding:2px 3px;font-size:11px}.jt td:first-child,.jt th:first-child{text-align:left;position:sticky;left:0;background:#fff}
+.scroll{overflow-x:auto}.wochen label{margin-right:6px;font-size:12px;white-space:nowrap}
+@media print{header,.noprint{display:none}body{background:#fff}.card{border:0;break-inside:avoid}}
