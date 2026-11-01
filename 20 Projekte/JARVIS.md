@@ -28,3 +28,7 @@ Behic hat am 2026-11-01 die `CLAUDE.md` des Repos „JARVIS" geteilt (Sprachassi
 
 ## Offen
 - Ziel/Stand von Behic mit JARVIS noch unklar (nur Datei geteilt, keine Aufgabe genannt).
+
+## Installation (2026-11-01)
+- Zip `jarvis-main` entpackt (in der Cloud-Sandbox getestet, Linux): venv + Python-Abhängigkeiten, `npm install`, `.env` aus Vorlage, SSL-Zertifikate erzeugt. Tests: 447 bestanden, 1 Dashboard-Browsertest fehlgeschlagen (Playwright-Download in Sandbox blockiert).
+- Für den echten Betrieb auf dem Mac nötig: `FISH_API_KEY` in `.env`, Claude Code ≥ 2.1.224 eingeloggt, Chrome.
