@@ -27,6 +27,12 @@ aktualisiert: 2026-11-01
 ## Gewünschte Erweiterung
 - TGA-Gewerke (HLSK, Elektro, MSR/GA usw.) einbauen. DIN 276 KG 400, Untergruppen noch prüfen (410–480).
 
-## Status
-- Brainstorming läuft, noch nichts gebaut.
-- Open-Source-Vorlage zur Orientierung: Civora-Dashboard (Next.js, Tailwind, shadcn).
+## Status (2026-11-01)
+- **Version 1 gebaut** und von unabhängigen Prüfern abgenommen. Repo: `Behic1402/kranblick-tga` (privat), Branch `claude/trusting-cori-6r02jc`.
+- Vite + React + TypeScript + three.js, läuft lokal im Browser (`npm install`, `npm run dev`), Daten im Browser-Speicher, Export/Import als JSON, Beispielprojekt mit erfundenen Daten.
+- Enthalten: 3D-Übersicht, Gebäudeansicht, KPI-Kacheln, Bauablauf-Leiste mit Statuswechsel, Vergabe-Assistent (Preisspiegel, Taktplan, Vorlauf-Warnung), Prüfpunkte, Mängelliste, Suche, Baustellen-Umschalter.
+- TGA-Gewerke: Heizung/Sanitär, Lüftung/Kälte, Elektro, MSR/Gebäudeautomation. KG-Nummern sind als „ungeprüft" beschriftet, bis sie an der DIN 276 abgeglichen sind.
+- Bekannte Lücken gegenüber dem Video: stilisiertes 3D (ca. 60 % Nähe), keine Handwerker-Kolonnen, keine Benachrichtigungen, kein Nutzerprofil, kein Login, kein IFC/BIM.
+- Offene Entscheidung: Branch in `main` übernehmen (kein Pull Request angelegt).
+- Verwandt: [[Kranblick-TGA Spezifikation]], [[Eigene Claude-Skills TGA]]
+- Regel von Behic: Ergebnisse werden erst geliefert, nachdem ein separater Prüferagent ohne Vorwissen sie gegen die Anforderungen geprüft hat.
