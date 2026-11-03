@@ -42,3 +42,10 @@ aktualisiert: 2026-11-01
 - Idee: IFC-Etagen werden zu Etagen, Räume zu Zonen, TGA-Bauteile werden den vier Gewerken zugeordnet; Status, Vergabe und Mängel hängen dann am echten Modell.
 - Status: Brainstorming läuft (Blindspot-Fragen), noch nichts gebaut. Direkt .rvt lesen geht im Browser nicht (geschlossenes Format).
 
+## Idee: Revit-Automatisierung (2026-11-03, nur notiert)
+- Frage von Behic: Kann Claude in seinem Revit Leitungen zeichnen und einzelne Gewerke nach seinen Vorgaben erstellen?
+- Antwort: Nicht direkt, Claude hat keinen Zugriff auf sein Revit. Realistisch sind **Skripte über die Revit-API** (pyRevit/Python, Dynamo oder C#-Add-in), die Behic in Revit ausführt, gesteuert über eine Regeltabelle (Systemtypen, Durchmesser, Höhen, Abstände, Familien). Gut für regelbasierte Arbeit, schwer bei freiem Routen mit Kollisionsvermeidung.
+- Grenze: Kein Revit zum Testen in der Cloud-Umgebung. Jedes Skript wird zuerst an einer Projektkopie getestet, fachliche Prüfung bleibt bei Behic.
+- Bildschirmsteuerung von Revit über die Claude-App wäre möglich, ist aber für präzises Zeichnen nicht empfehlenswert.
+- Entscheidung von Behic: aktuell **nur die Frage geklärt**, kein Auftrag. Der IFC-Import in Kranblick ist ebenfalls noch nicht gestartet (Blindspot-Fragen offen: Testmodell, Zuordnung der Bauteile zu Gewerken).
+
