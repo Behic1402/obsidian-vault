@@ -36,3 +36,9 @@ aktualisiert: 2026-11-01
 - Offene Entscheidung: Branch in `main` übernehmen (kein Pull Request angelegt).
 - Verwandt: [[Kranblick-TGA Spezifikation]], [[Eigene Claude-Skills TGA]]
 - Regel von Behic: Ergebnisse werden erst geliefert, nachdem ein separater Prüferagent ohne Vorwissen sie gegen die Anforderungen geprüft hat.
+
+## Nächste Ausbaustufe: Revit-Modell (2026-11-03)
+- Behic will ein Revit-Modell (.rvt) in das Tool laden. Entschieden: **Weg über IFC, lokal im Browser** (Revit exportiert IFC, Bibliothek `web-ifc`), kein Upload zu Autodesk.
+- Idee: IFC-Etagen werden zu Etagen, Räume zu Zonen, TGA-Bauteile werden den vier Gewerken zugeordnet; Status, Vergabe und Mängel hängen dann am echten Modell.
+- Status: Brainstorming läuft (Blindspot-Fragen), noch nichts gebaut. Direkt .rvt lesen geht im Browser nicht (geschlossenes Format).
+
