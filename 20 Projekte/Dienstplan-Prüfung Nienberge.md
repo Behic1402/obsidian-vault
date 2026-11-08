@@ -72,10 +72,16 @@ Zukünftige Wochen = Soll, aktuelle/vergangene evtl. Ist → Hinweis auf Mischun
 - Prüfkandidaten für Überstundenabbau/Freistellung: Berufsgruppe, KBO, Labor, Auf-/Abschließen, Notdienst, Pausenverteilung beachten. Rosa allein heißt nicht „frei möglich"; Zeitabschnitts-Reserve von ganztägiger Freistellung unterscheiden.
 - Optimierungsvorschläge zur Prüfdatei willkommen, aber die festgelegten Regeln nicht ändern.
 
+## Gelernte Auslegungen (aus Dezember-Exporten)
+- Derselbe Dienst steht in bis zu drei Abschnitten (3 Haupt, 3b KBO, 3c Labor). Ohne Kürzel gilt der Abschnittsstandard (Haupt = JZN, 3b = KBO, 3c = Labor).
+- Exportgrenze: Dienste über Mitternacht erscheinen als „bis 23:59“ und „ab 00:00“ (vermutlich Notdienst), gelten als lückenlos.
+- „Überstundena…“ ist im Export gekürzt (Überstundenabbau), zählt nicht als Anwesenheit.
+
 ## Nutzung (Behic, 2026-11-08)
 - **Monatlicher Ablauf:** Einmal im Monat werden die 4–5 Wochenexporte (ApoCollect) für den **darauffolgenden Monat** hochgeladen und geprüft.
 - Dezember 2026 dient als Beispiel/Testfall. Ziel: wiederverwendbares Werkzeug/Skill, Regeln bleiben unverändert.
 - Pro Lauf zusätzlich nötig: Notdiensttermine des Monats.
 
 ## Stand
-- 2026-11-08: Regeln aufgenommen. **Exportdateien fehlen noch** (nicht in der Sitzung angekommen), Notdiensttermine fehlen ebenfalls.
+- 2026-11-08: Regeln aufgenommen. Dezember-2026-Exporte (KW 49–53) eingelesen, Werkzeug gebaut: `Tools/Dienstplan-Prüfung Nienberge/` (README dort), Skill `.claude/skills/dienstplan-pruefung`. Exporte und Prüfdatei liegen **nicht** im Repo (Mitarbeiterdaten).
+- Offen: Notdiensttermine Dezember, Feiertage 25.12./26.12./01.01. (Öffnung?), 24./31.12. manuell.
