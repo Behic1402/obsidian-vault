@@ -75,7 +75,7 @@ def block_hint(r, d):
         parts.append(f"Pausenabstimmung erforderlich: {rng(x['a'], x['b'])} {x['kind']} nur {x['ist']} (Soll {x['soll']}), wenn alle zur Richtzeit pausieren ({pn}); {zus}")
     if "ziel_text" in r:
         if r.get("ziel_abw"): parts.append(r["ziel_text"] + " – Zielzusammensetzung weicht ab")
-        elif r.get("ziel_ok") and r.get("ziel_ueber"): parts.append(r["ziel_text"] + " – Ziel erfüllt (mehr Personen als Ziel)")
+        elif r.get("ziel_ok") and r.get("ziel_ueber"): parts.append(r["ziel_text"] + " – Mindestzahl erfüllt; Zusammensetzung über dem Ziel (mehr als 1 + 2), kein Mangel")
         elif r.get("ziel_ok"): parts.append(r["ziel_text"] + " – Ziel erfüllt")
         else: parts.append(r["ziel_text"] + " – Zielzusammensetzung nicht beurteilbar, solange Mindestzahl nicht erfüllt")
     if r["tmax"] > r["tmin"] and r["tmin"] >= r["tsoll"] and not parts:
@@ -252,7 +252,7 @@ def write_report(A, path, titel, quelle_text):
                 put(wsD, r, 1, dstr(d)); put(wsD, r, 2, day["wd"]); put(wsD, r, 3, "Labor approbiert"); wsD.merge_cells(start_row=r, start_column=4, end_row=r, end_column=9); put(wsD, r, 4, "keine approbierte Laborperson", RED); zus += 1; r += 1
     if not zus: put(wsD, r, 1, "keine"); r += 1
     r += 1
-    banner(wsD, r, "2 · Hinweise zur flexiblen Pausenverteilung – „Pausenabstimmung erforderlich“ (keine feste Unterbesetzung)", 9, "FFE699", True, 12); r += 1
+    banner(wsD, r, "2 · Hinweise zur flexiblen Pausenverteilung – „Pausenabstimmung erforderlich“ (keine feste Unterbesetzung; Ausnahme: rot markierte Zeilen = auch bei freier Staffelung nicht abdeckbar, Klärung nötig)", 9, "FFE699", True, 12); r += 1
     wsD.merge_cells(start_row=r, start_column=1, end_row=r, end_column=9)
     wsD.cell(r, 1, "Rechnerisches Szenario: alle eingetragenen Pausen (Dauer laut Export) liegen genau zur Richtzeit bzw. an der Dienstlücke. Die tatsächlichen Pausen werden täglich gestaffelt; das Szenario zeigt nur, wo abgestimmt werden muss.").alignment = WRAP
     wsD.row_dimensions[r].height = 30; r += 1

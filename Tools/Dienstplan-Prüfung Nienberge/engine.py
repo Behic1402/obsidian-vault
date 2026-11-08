@@ -173,7 +173,7 @@ def _state(bereich, grp):
 
 
 def _sn(x):
-    return {"C": "anrechenbar", "L": "Labor (nicht approbiert)", "N": "nicht Nienberge", "U": "unklar"}[x]
+    return {"C": "Dienst in Nienberge", "L": "Labor (nicht approbiert)", "N": "Dienst außerhalb Nienberge (z. B. JZA/JZY)", "U": "unklarer Dienst"}[x]
 
 
 def counts(m, pauses=False, exclude=()):

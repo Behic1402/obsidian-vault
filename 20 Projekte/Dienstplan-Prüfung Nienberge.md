@@ -84,4 +84,11 @@ Zukünftige Wochen = Soll, aktuelle/vergangene evtl. Ist → Hinweis auf Mischun
 
 ## Stand
 - 2026-11-08: Regeln aufgenommen. Dezember-2026-Exporte (KW 49–53) eingelesen, Werkzeug gebaut: `Tools/Dienstplan-Prüfung Nienberge/` (README dort), Skill `.claude/skills/dienstplan-pruefung`. Exporte und Prüfdatei liegen **nicht** im Repo (Mitarbeiterdaten).
+- Dezember-Prüfung erstellt und von separatem Prüferagenten freigegeben (alle 159 Zeitblöcke nachgerechnet, 0 Abweichungen). Befunde Dezember: 9 Unterbesetzungs-Zeitspannen, KBO 2× und Labor 6× nicht erfüllt.
 - Offen: Notdiensttermine Dezember, Feiertage 25.12./26.12./01.01. (Öffnung?), 24./31.12. manuell.
+
+## Offene Entscheidungen an Behic
+- Pause der einzigen approbierten Person (09.12.): echte Unterbesetzung oder nur Hinweis?
+- Samstag über Ziel (2+3 statt 1+2): Abweichung oder ok?
+- Wochenreste anderer Monate (30.11., 02.01.) künftig mitbewerten?
+- Feiertage 25.12./26.12./01.01.: geschlossen?
