@@ -71,9 +71,13 @@ def block_hint(r, d):
         parts.append("nicht eindeutig: Soll nur mit unsicher anrechenbarer Person (überbrückte Pause, anderer Bereich) erreichbar")
     for x in r.get("pause", []):
         pn = ", ".join(f"{short(p['name'])} {fmt(p['start'])}" for p in x["pausen"])
-        parts.append(f"Pausenabstimmung erforderlich: {rng(x['a'], x['b'])} {x['kind']} nur {x['ist']} (Soll {x['soll']}), wenn alle zur Richtzeit pausieren ({pn})")
-    if r.get("ziel_abw"):
-        parts.append(r["ziel_text"] + " – Zielzusammensetzung weicht ab")
+        zus = "gestaffelt rechnerisch möglich" if x.get("staffelbar", True) else "AUCH bei freier Staffelung der Pausen innerhalb der Dienste nicht abdeckbar"
+        parts.append(f"Pausenabstimmung erforderlich: {rng(x['a'], x['b'])} {x['kind']} nur {x['ist']} (Soll {x['soll']}), wenn alle zur Richtzeit pausieren ({pn}); {zus}")
+    if "ziel_text" in r:
+        if r.get("ziel_abw"): parts.append(r["ziel_text"] + " – Zielzusammensetzung weicht ab")
+        elif r.get("ziel_ok") and r.get("ziel_ueber"): parts.append(r["ziel_text"] + " – Ziel erfüllt (mehr Personen als Ziel)")
+        elif r.get("ziel_ok"): parts.append(r["ziel_text"] + " – Ziel erfüllt")
+        else: parts.append(r["ziel_text"] + " – Zielzusammensetzung nicht beurteilbar, solange Mindestzahl nicht erfüllt")
     if r["tmax"] > r["tmin"] and r["tmin"] >= r["tsoll"] and not parts:
         pass
     return "\n".join(parts)
@@ -118,7 +122,7 @@ def write_report(A, path, titel, quelle_text):
             put(wsW, r, 1, f"KW {day['kw']}"); put_date(wsW, r, 2, d, day["im_monat"]); put(wsW, r, 3, lab)
             wsW.merge_cells(start_row=r, start_column=4, end_row=r, end_column=9)
             if day["status"] == "sonder":
-                txt = "Sonderregel (24.12./31.12.): nur 08:00–13:00 geöffnet, immer genau 3 Personen – wird zunächst manuell geprüft, hier nicht bewertet."; col = NEUT
+                txt = "Sonderregel (24.12./31.12.): nur 08:00–13:00 geöffnet, immer genau 3 Personen – manuell zu prüfen, hier nicht bewertet."; col = NEUT
             elif day["status"] == "feiertag":
                 txt = "Feiertag laut Export – Öffnung und Besetzung zur Klärung, nicht bewertet. " + ("Dienste eingetragen: " + ", ".join(sorted({s['name'] for s in N['shifts'] if s['datum'] == d.isoformat()})) if any(s['datum'] == d.isoformat() for s in N['shifts']) else "Keine Dienste eingetragen.")
                 col = GREY
@@ -164,8 +168,12 @@ def write_report(A, path, titel, quelle_text):
         put(wsK, r, 1, f"KW {day['kw']}"); put_date(wsK, r, 2, d, day["im_monat"]); put(wsK, r, 3, day["wd"])
         hint = []
         if day["status"] != "pruefen":
-            txt, col = (("manuell geprüft (Sonderregel)", NEUT) if day["status"] == "sonder" else ("Feiertag – zur Klärung", GREY) if day["status"] == "feiertag" else ("Sonntag – nicht bewertet", GREY))
-            for c in range(4, 9): put(wsK, r, c, txt if c < 8 else ("manuell geprüft (Sonderregel)" if day["status"] == "sonder" else txt), col)
+            txt, col = (("manuell zu prüfen (Sonderregel)", NEUT) if day["status"] == "sonder" else ("Feiertag – zur Klärung", GREY) if day["status"] == "feiertag" else ("Sonntag – nicht bewertet", GREY))
+            for c in range(4, 9):
+                if c == 8 and day["status"] == "sonder":
+                    put(wsK, r, c, "offen – Termine fehlen" if not A["notdienst_termine"] else "offen – Sonderregel, manuell prüfen", GREY)
+                else:
+                    put(wsK, r, c, txt, col)
             if A["notdienst_termine"] == [] and day["status"] != "sonder": pass
             put(wsK, r, 9, ""); r += 1; continue
         # KBO
@@ -210,7 +218,7 @@ def write_report(A, path, titel, quelle_text):
         put(wsK, r, 9, "\n".join(hint))
         r += 1
     # -------- Detail Engpässe
-    setw(wsD, [12, 6, 20, 24, 14, 8, 8, 52, 70])
+    setw(wsD, [12, 6, 20, 24, 14, 12, 8, 52, 70])
     wsD.merge_cells("A1:I1"); wsD["A1"] = "Detailübersicht der Engpässe und Hinweise"; wsD["A1"].font = Font(bold=True, size=14)
     r = 3
     banner(wsD, r, "1 · Bestätigte Unterbesetzungen (Besetzung ohne Abzug flexibler Mittagspausen)", 9, "F4A6A6", True, 12); r += 1
@@ -248,10 +256,10 @@ def write_report(A, path, titel, quelle_text):
     wsD.merge_cells(start_row=r, start_column=1, end_row=r, end_column=9)
     wsD.cell(r, 1, "Rechnerisches Szenario: alle eingetragenen Pausen (Dauer laut Export) liegen genau zur Richtzeit bzw. an der Dienstlücke. Die tatsächlichen Pausen werden täglich gestaffelt; das Szenario zeigt nur, wo abgestimmt werden muss.").alignment = WRAP
     wsD.row_dimensions[r].height = 30; r += 1
-    head(wsD, r, ["Datum", "Tag", "Zeitraum", "Zeitblock", "Art", "Ist mit Richtzeit-Pausen", "Soll", "Besetzung ohne Pausenabzug (Min im Zeitraum)", "Pausen in diesem Zeitraum (Richtzeit, Dauer)"]); r += 1
+    head(wsD, r, ["Datum", "Tag", "Zeitraum", "Zeitblock", "Art", "Ist bei Pausen", "Soll", "Besetzung ohne Pausenabzug (Min im Zeitraum)", "Pausen in diesem Zeitraum (Richtzeit, Dauer)"]); r += 1
     for d, x in A["pausen"]:
         put(wsD, r, 1, dstr(d)); put(wsD, r, 2, WD[d.weekday()]); put(wsD, r, 3, rng(x["a"], x["b"])); put(wsD, r, 4, x["label"]); put(wsD, r, 5, x["kind"])
-        put(wsD, r, 6, x["ist"], YEL, align=CEN); put(wsD, r, 7, x["soll"], align=CEN); put(wsD, r, 8, x["ohne"])
+        put(wsD, r, 6, x["ist"], YEL, align=CEN); put(wsD, r, 7, x["soll"], align=CEN); put(wsD, r, 8, f"Ohne Pausenabzug min. {x['ohne']}; " + ("gestaffelt rechnerisch möglich (Annahme: Pause frei im Dienst, ±2 h um Richtzeit)" if x.get("staffelbar", True) else "AUCH bei freier Staffelung der Pausen innerhalb der Dienste nicht abdeckbar – Klärung nötig"), None if x.get("staffelbar", True) else RED)
         put(wsD, r, 9, "; ".join(f"{short(p['name'])} {fmt(p['start'])} ({p['dur']} min{', Lücke' if p['quelle'] == 'Lücke' else ''})" for p in x["pausen"])); r += 1
     if not A["pausen"]: put(wsD, r, 1, "keine"); r += 1
     r += 1
@@ -283,7 +291,7 @@ def write_report(A, path, titel, quelle_text):
     wsC.merge_cells("A2:I2")
     wsC["A2"] = ("Nur Prüfkandidaten, keine Zusage. Rechnerisch geprüft: Gesamt- und Approbiertenbesetzung je Zeitblock, Auf-/Abschließen, KBO 10/16 Uhr, Labor Mo/Mi/Fr (Berufsgruppe der Person berücksichtigt). "
                  "Nicht berücksichtigt: Notdienst (Tage mit Notdienst werden ausgelassen), tatsächliche Pausenstaffelung, persönliche Umstände. Eine rosa Gesamtbesetzung allein bedeutet nicht, dass jede Person frei bekommen kann. "
-                 "Gezeigt werden Tage ohne bestätigte Unterbesetzung, ohne unsichere Anrechnung und mit erfüllten Zusatzprüfungen.")
+                 "Gezeigt werden Tage ohne bestätigte Unterbesetzung, ohne unsichere Anrechnung, ohne möglichen Notdienst-Abschnitt (über Mitternacht) und mit erfüllten Zusatzprüfungen; bei Tagen mit Notdienst-Verdacht werden keine Kürzungen vorgeschlagen (Notdienst ungeklärt).")
     wsC["A2"].alignment = WRAP; wsC.row_dimensions[2].height = 62
     head(wsC, 4, ["Datum", "Tag", "Person", "Berufsgruppe", "Dienst (Bereich)", "Ganzer Dienst", "Später beginnen möglich bis", "Früher enden möglich ab", "Hinweise"])
     wsC.freeze_panes = "A5"
@@ -408,9 +416,9 @@ def write_overview(wb, ws, A, titel, quelle_text):
             if not nap and not unk: lab_rot += 1
     lines = [
         f"Geprüft wurden {tage_n} Öffnungstage ({len(A['weeks'])} Wochen). Nicht bewertet: 24.12. und 31.12. (manuell), Feiertage laut Export (25.12., 26.12., 01.01.).",
-        f"Bestätigte Unterbesetzungen: {len(conf)} Zeitspannen an {len(days_conf)} Tagen: " + "; ".join(f"{b['datum'].strftime('%d.%m.')} {rng(b['von'], b['bis'])} ({b['kind']} {b['ist']}/{b['soll']})" for b in conf[:12]) + (" …" if len(conf) > 12 else "") + ".",
+        f"Bestätigte Unterbesetzungen: {len({(b['datum'], b['von'], b['bis']) for b in conf})} Zeitspannen ({len(conf)} Befunde, Gesamt und Approbierte getrennt gezählt) an {len(days_conf)} Tagen: " + "; ".join(f"{b['datum'].strftime('%d.%m.')} {rng(b['von'], b['bis'])} ({b['kind']} {b['ist']}/{b['soll']})" for b in conf[:12]) + (" …" if len(conf) > 12 else "") + ".",
         f"Nicht erfüllte Zusatzprüfungen: KBO-Prüfzeitpunkte {kbo_rot}×, Labor-Pflicht {lab_rot}× (Details: Blatt „Detail Engpässe“, Abschnitt 1b).",
-        f"Pausenabstimmung erforderlich an {len({d for d, x in A['pausen']})} Tagen (Richtzeit-Pausen würden gleichzeitig unter das Soll fallen; keine feste Unterbesetzung).",
+        f"Pausenabstimmung erforderlich an {len({d for d, x in A['pausen']})} Tagen (Richtzeit-Pausen würden gleichzeitig unter das Soll fallen; keine feste Unterbesetzung)." + (" Nicht abdeckbar auch bei freier Staffelung: " + ", ".join(sorted({d.strftime('%d.%m.') for d, x in A['pausen'] if not x.get('staffelbar', True)})) + " (Pause der einzigen anwesenden approbierten Person)." if any(not x.get("staffelbar", True) for d, x in A["pausen"]) else ""),
         "Zeiträume ohne Personalreserve (Gesamtbesetzung genau Soll), häufigste Zeitblöcke: " + ", ".join(f"{k} ({v}×)" for k, v in ys.most_common(4)) + ".",
         "Erhöhte Personalreserve (Gesamtbesetzung ≥ Soll + 3): " + (", ".join(f"{k} ({v}×)" for k, v in pk.most_common(4)) if pk else "keine") + ". Konkrete Freistellungsmöglichkeiten: Blatt „Prüfkandidaten“.",
     ]
@@ -437,7 +445,7 @@ def write_overview(wb, ws, A, titel, quelle_text):
     for c, t in ((RED, "0 approbierte Personen"), (LGR, "1"), (DGR, "2"), (PINK, "3 oder mehr"), (NEUT, "nicht erforderlich (z. B. Aufschließen) bzw. entfällt")):
         leg(c, t, r); r += 1
     ws.cell(r, 1, "Zusatzprüfungen (KBO, Labor, Notdienst)").font = BOLD; r += 1
-    for c, t in (("A9D18E", "erfüllt"), (RED, "nicht erfüllt"), (GREY, "nicht eindeutig prüfbar (fehlende/unklare Angaben, Feiertag, offen)"), (NEUT, "entfällt / manuell geprüft")):
+    for c, t in (("A9D18E", "erfüllt"), (RED, "nicht erfüllt"), (GREY, "nicht eindeutig prüfbar (fehlende/unklare Angaben, Feiertag, offen)"), (NEUT, "entfällt / manuell zu prüfen (Sonderregel)")):
         leg(c, t, r); r += 1
     r += 1
     banner(ws, r, "Prüfgrundlagen und Annahmen", 5, BAND, True, 12); r += 1

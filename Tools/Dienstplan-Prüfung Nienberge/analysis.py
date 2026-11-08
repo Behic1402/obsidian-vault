@@ -1,7 +1,7 @@
 """Auswertung: Wochen/Tage/Blöcke, bestätigte Unterbesetzungen, KBO/Labor/Notdienst, Pausen, Prüfkandidaten."""
 import datetime as dt, collections, copy
 import numpy as np
-from normalize import normalize, tmin, fmt, group_of
+from normalize import normalize, tmin, fmt, group_of, ROLE_OVERRIDE
 from engine import *
 
 WD = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
@@ -26,7 +26,8 @@ def spans(mask, off=0):
 
 def role_label(N, name):
     r = N["personen"][name]["rolle"]
-    g = group_of(name, r)
+    if (name, r) in ROLE_OVERRIDE:
+        return "PTA-Praktikant, Export: Auszubildende/r"
     return (r or "ohne Berufsbezeichnung")
 
 
@@ -96,6 +97,8 @@ def analyze(weeks, notdienst=(), sondertage=SONDERTAGE_DEFAULT, monat=None):
             res = eval_blocks(m, cnt)
             day["cnt"] = cnt
             pis = pause_issues(m)
+            stag = stagger_feasible(m) if pis else True
+            for x in pis: x["staffelbar"] = stag
             for r in res:
                 r["pause"] = [x for x in pis if x["a"] >= r["a"] and x["b"] <= r["b"]]
                 r["nap_min"] = int(cnt["nap"][r["a"]:r["b"]].min())
@@ -159,7 +162,9 @@ def analyze(weeks, notdienst=(), sondertage=SONDERTAGE_DEFAULT, monat=None):
                     if r["name"] == "" and r["tsoll"] == 3:
                         ok_min = r["tmin"] >= r["tsoll"] and r["amin"] >= r["asoll"]
                         r["ziel_abw"] = ok_min and (r["amin"] < 1 or r["nap_min"] < 2)
-                        r["ziel_text"] = f"Zielbesetzung 1 Apotheker/in + 2 PTA/Praktikant/PhiP: Ist min. {r['amin']} approbiert, {r['nap_min']} nicht approbiert"
+                        r["ziel_text"] = f"Zielzusammensetzung (1 Apotheker/in + 2 PTA/PTA-Praktikant/PhiP): Ist min. {r['amin']} approbiert, {r['nap_min']} nicht approbiert"
+                        r["ziel_ueber"] = ok_min and not r["ziel_abw"] and (r["amin"] > 1 or r["nap_min"] > 2)
+                        r["ziel_ok"] = ok_min and not r["ziel_abw"]
         A["tage"].append(day)
     # Notdienst
     for nd in A["notdienst_termine"]:
@@ -249,6 +254,13 @@ def kandidaten(A, byday):
         m0, sh = A["models"][d]
         if violations(m0) or d in nd_days:
             continue
+        if any(s["von"] == "00:00" or s["bis"] == "23:59" for s in sh):
+            continue      # möglicher Notdienst (Abschnitt über Mitternacht): keine Kürzungsvorschläge
+        nxt = A["models"].get(d + dt.timedelta(days=1)); prv = A["models"].get(d - dt.timedelta(days=1))
+        if any(x and any(s["von"] == "00:00" or s["bis"] == "23:59" for s in x[1]) for x in (nxt, prv)):
+            continue
+        if any(m0.P[n][465:1140].any() for n in m0.P):
+            continue      # unsichere Anrechnung am Tag
         if any(r["unsicher_gesamt"] or r["unsicher_app"] for r in day["blocks"]):
             continue
         base_p = {(x["kind"], x["a"], x["b"]) for x in pause_issues(m0)}

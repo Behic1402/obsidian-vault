@@ -130,7 +130,7 @@ def build_model(date, shifts, persons, hints_out=None):
                 Br[b1:a2] = True
                 m.pauses.append({"name": name, "start": b1, "dur": gap, "quelle": "Lücke"})
                 if x1 != x2:
-                    m.hints.append(("Pause", f"{name}: überbrückte Pause {fmt(b1)}–{fmt(a2)} zwischen unterschiedlichen Zuordnungen ({_sn(x1)} → {_sn(x2)}), Anrechenbarkeit unsicher"))
+                    m.hints.append(("Pause", f"{name}: Lücke {fmt(b1)}–{fmt(a2)} zwischen {_sn(x1)} und {_sn(x2)}: Anrechenbarkeit ungeklärt, in der Mindest-Ist-Zahl nicht mitgezählt"))
             else:
                 m.hints.append(("Datenpflege", f"{name}: Lücke {fmt(b1)}–{fmt(a2)} ({gap} min) zwischen Diensten, nicht als Mittagspause behandelt"))
         # annotierte Pausen
@@ -260,6 +260,53 @@ def violations(m, cnt=None):
     return v
 
 
+def stagger_feasible(m, window=120, step=15):
+    """Gibt es irgendeine Staffelung der Pausen (Beginn frei im Dienst, +-window min um die Richtzeit,
+    15-min-Raster; Lückenpausen fest), bei der alle Mindestzahlen eingehalten werden?
+    Rechnerische Prüfung, keine Zusage."""
+    base = counts(m)
+    soll_t = np.zeros(M, int); soll_a = np.zeros(M, int)
+    for a, b, name, gs, ps in blocks_for(m.date):
+        soll_t[a:b] = gs; soll_a[a:b] = ps
+    ps_ = [p for p in m.pauses if m.C[p["name"]][p["start"]:p["start"] + p["dur"]].any()]
+    if not ps_:
+        return True
+    lo = min(p["start"] for p in ps_) - window; hi = max(p["start"] + p["dur"] for p in ps_) + window
+    lo = max(lo, 0); hi = min(hi, M)
+    opts = []
+    for p in ps_:
+        n = p["name"]; grp = m.group(n)
+        if p["quelle"] == "Lücke":
+            starts = [p["start"]]
+        else:
+            starts = []
+            for a, b, br, akt, sh in m.site[n]:
+                for t in range(max(a, p["start"] - window), min(b - p["dur"], p["start"] + window) + 1, step):
+                    if m.C[n][t:t + p["dur"]].all(): starts.append(t)
+            starts = sorted(set(starts)) or [p["start"]]
+        opts.append((n, grp, p["dur"], starts))
+    tot = base["tot"].copy(); app = base["app"].copy()
+    ok_base = ((tot - soll_t)[lo:hi] >= 0).all() and ((app - soll_a)[lo:hi] >= 0).all()
+    if not ok_base:
+        return False
+    def rec(i):
+        if i == len(opts):
+            return True
+        n, grp, dur, starts = opts[i]
+        for t in starts:
+            tot[t:t + dur] -= 1
+            if grp == "approbiert": app[t:t + dur] -= 1
+            good = ((tot - soll_t)[lo:hi] >= 0).all() and ((app - soll_a)[lo:hi] >= 0).all()
+            if good and rec(i + 1):
+                tot[t:t + dur] += 1
+                if grp == "approbiert": app[t:t + dur] += 1
+                return True
+            tot[t:t + dur] += 1
+            if grp == "approbiert": app[t:t + dur] += 1
+        return False
+    return rec(0)
+
+
 def pause_issues(m, base=None):
     """Szenario: alle Pausen zur Richtzeit. Liefert Blöcke, in denen dadurch Soll unterschritten würde,
     obwohl die Besetzung ohne Abzug ausreicht."""
@@ -285,7 +332,7 @@ def pause_issues(m, base=None):
                     else:
                         i += 1
                 for (x, y, ist, ohne) in spans:
-                    pw = [p for p in m.pauses if p["start"] < y and p["start"] + p["dur"] > x]
+                    pw = [p for p in m.pauses if p["start"] < y and p["start"] + p["dur"] > x and m.C[p["name"]][max(p["start"], x):min(p["start"] + p["dur"], y)].any()]
                     out.append({"kind": kind, "a": x, "b": y, "ist": ist, "ohne": ohne, "soll": soll,
                                 "label": block_label(a, b, name), "pausen": pw})
     return out
