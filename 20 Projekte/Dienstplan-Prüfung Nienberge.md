@@ -85,10 +85,11 @@ Zukünftige Wochen = Soll, aktuelle/vergangene evtl. Ist → Hinweis auf Mischun
 ## Stand
 - 2026-11-08: Regeln aufgenommen. Dezember-2026-Exporte (KW 49–53) eingelesen, Werkzeug gebaut: `Tools/Dienstplan-Prüfung Nienberge/` (README dort), Skill `.claude/skills/dienstplan-pruefung`. Exporte und Prüfdatei liegen **nicht** im Repo (Mitarbeiterdaten).
 - Dezember-Prüfung erstellt und von separatem Prüferagenten freigegeben (alle 159 Zeitblöcke nachgerechnet, 0 Abweichungen). Befunde Dezember: 9 Unterbesetzungs-Zeitspannen, KBO 2× und Labor 6× nicht erfüllt.
-- Offen: Notdiensttermine Dezember, Feiertage 25.12./26.12./01.01. (Öffnung?), 24./31.12. manuell.
+- Offen: Notdiensttermine 2027 (kommen von Behic), 24./31.12. manuell.
 
-## Offene Entscheidungen an Behic
-- Pause der einzigen approbierten Person (09.12.): echte Unterbesetzung oder nur Hinweis?
-- Samstag über Ziel (2+3 statt 1+2): Abweichung oder ok?
-- Wochenreste anderer Monate (30.11., 02.01.) künftig mitbewerten?
-- Feiertage 25.12./26.12./01.01.: geschlossen?
+## Entscheidungen von Behic (2026-11-08, nach Dezember-Prüfung)
+- **Pause der approbierten Person:** Wer als einzige approbierte Person da ist, macht die Pause in den Räumen der Apotheke. Eine pausierende approbierte Person **zählt weiter** für die Mindestzahl Approbierte (1). „Nicht abdeckbar“ wegen Pause einer einzigen Approbierten ist **kein Befund**. Für die Gesamtzahl bleibt der Pausenabzug im Szenario „Pausenabstimmung“ bestehen.
+- **Samstag:** 09:00–13:00 genau **3 Personen (mind. und max. 3)**. Mehr als 3 ist ein Mangel (Überbesetzung).
+- **Folgemonat ignorieren:** Tage nach dem Prüfmonat (Januar) werden vorerst nicht geprüft, die Planung wird dort noch angepasst. Wochenreste **vor** dem Prüfmonat (30.11.) werden mitgeprüft und kursiv grau markiert (gefällt Behic).
+- **Feiertage** (25.12., 26.12., 01.01.): Apotheke **geschlossen**, nicht prüfen (entfällt).
+- **Notdienst:** Nacht 30.11. auf 01.12.2026 (Katja Schlömer) ist ein Notdienst, **Termin 30.11.2026** (09:00 bis 09:00). Das war der **letzte Notdienst 2026**. Termine für 2027 schickt Behic später.

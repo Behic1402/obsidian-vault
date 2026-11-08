@@ -31,11 +31,12 @@ def role_label(N, name):
     return (r or "ohne Berufsbezeichnung")
 
 
-def analyze(weeks, notdienst=(), sondertage=SONDERTAGE_DEFAULT, monat=None):
+def analyze(weeks, notdienst=None, sondertage=SONDERTAGE_DEFAULT, monat=None):
     weeks = sorted(weeks, key=lambda w: w["von"][6:] + w["von"][3:5] + w["von"][:2])
     N = normalize(weeks)
     A = {"N": N, "weeks": [], "tage": [], "befunde": [], "pausen": [], "daten": [], "offen": [], "kandidaten": [],
-         "notdienst_termine": [D(x) for x in notdienst], "monat": monat}
+         "notdienst_termine": [D(x) for x in (notdienst or [])], "notdienst_bekannt": notdienst is not None, "monat": monat,
+         "ueber": []}
     exportdaten = sorted(x for x in N["exportdaten"] if x)
     A["exportdaten"] = exportdaten
     byday = collections.defaultdict(list)
@@ -75,6 +76,8 @@ def analyze(weeks, notdienst=(), sondertage=SONDERTAGE_DEFAULT, monat=None):
     # Tagesauswertung
     for t in N["tage"]:
         d = D(t["datum"]); m, sh = models[d]
+        if monat and d.strftime("%Y-%m") > monat:
+            continue        # Folgemonat wird vorerst nicht geprüft (Entscheidung Behic)
         day = {"datum": d, "wd": WD[d.weekday()], "kw": t["kw"], "typ": daytype(d), "status": "pruefen",
                "blocks": [], "kbo": {}, "lab": None, "notiz": []}
         mmdd = d.strftime("%m-%d")
@@ -85,9 +88,7 @@ def analyze(weeks, notdienst=(), sondertage=SONDERTAGE_DEFAULT, monat=None):
         elif d.isoformat() in feiertag:
             day["status"] = "feiertag"; day["feiertag_personen"] = sorted(feiertag[d.isoformat()])
             if sh:
-                A["offen"].append((dstr(d), "Feiertag mit eingetragenen Diensten – Öffnung/Besetzung klären", ", ".join(sorted({s['name'] for s in sh}))))
-            else:
-                A["offen"].append((dstr(d), "Feiertag laut Export – keine Dienste eingetragen; Öffnung/Besetzung klären (nicht bewertet)", ""))
+                A["offen"].append((dstr(d), "Feiertag (Apotheke geschlossen) mit eingetragenen Diensten – bitte klären", ", ".join(sorted({s['name'] for s in sh}))))
         elif day["typ"] == "so":
             day["status"] = "sonntag"
             if sh:
@@ -107,6 +108,14 @@ def analyze(weeks, notdienst=(), sondertage=SONDERTAGE_DEFAULT, monat=None):
                 r["bestaetigt_gesamt"] = r["tpot_min"] < r["tsoll"]
                 r["bestaetigt_app"] = bool(r["asoll"]) and r["apot_min"] < r["asoll"]
             day["blocks"] = res
+            if day["typ"] == "sa":
+                for r in res:
+                    if r["name"] == "" and r["tsoll"] == 3:
+                        r["ueber_max"] = r["tmax"] if r["tmax"] > 3 else 0
+                        for (x, y) in spans(cnt["tot"][r["a"]:r["b"]] > 3, r["a"]):
+                            ids = [n for n in m.C if m.C[n][x:y].any()]
+                            A["ueber"].append({"datum": d, "von": x, "bis": y, "ist": int(cnt["tot"][x:y].max()), "block": r["label"],
+                                               "personen": [f"{n} ({role_label(N, n)})" for n in ids]})
             # Bestätigte / offene Unterbesetzungen als Zeitspannen
             for kind, key, pkey, soll_i in (("Gesamt", "tot", "pt", 3), ("Approbierte", "app", "pa", 4)):
                 for r in res:
@@ -132,7 +141,7 @@ def analyze(weeks, notdienst=(), sondertage=SONDERTAGE_DEFAULT, monat=None):
         # Datenpflege (Tätigkeit vs. Bereich, Mitternachtsabschnitte)
         for s in sh:
             beres = sorted(s["bereiche"]); acts = sorted(s["taetigkeiten"])
-            if s["von"] == "00:00" or s["bis"] == "23:59":
+            if (s["von"] == "00:00" or s["bis"] == "23:59") and not A["notdienst_bekannt"]:
                 A["offen"].append((dstr(d), f"Dienstabschnitt über Mitternacht (exportbedingt geteilt bei 23:59/00:00): {s['name']} {s['von']}–{s['bis']} – möglicher Notdienst, Termine nicht mitgeteilt", s["name"]))
             if len(s["bereiche"]) != 1:
                 A["daten"].append(("Bereich nicht eindeutig", s["name"], dstr(d), f"{s['von']}–{s['bis']}: Bereiche {beres or ['keiner']}"))

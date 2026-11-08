@@ -188,17 +188,18 @@ def counts(m, pauses=False, exclude=()):
         if n in exclude:
             continue
         C = m.C[n]; P = m.P[n]
+        Ct, Pt = C, P
         if pm is not None and n in pm:
-            C = C & ~pm[n]; P = P & ~pm[n]
+            Ct = C & ~pm[n]; Pt = P & ~pm[n]     # Pause: Person steht für die Gesamtzahl nicht zur Verfügung
         g = m.group(n)
-        tot += C
+        tot += Ct
         if g == "approbiert":
-            app += C; pa += P
+            app += C; pa += P     # pausierende Approbierte bleibt in der Apotheke und zählt für Approbierte weiter
         elif g == "nicht_approbiert":
-            nap += C
+            nap += Ct
         else:
             pa += P   # unklar: potentiell approbiert
-        pt += P
+        pt += Pt
     return {"tot": tot, "app": app, "nap": nap, "pt": pt, "pa": pa}
 
 
@@ -286,7 +287,7 @@ def stagger_feasible(m, window=120, step=15):
             starts = sorted(set(starts)) or [p["start"]]
         opts.append((n, grp, p["dur"], starts))
     tot = base["tot"].copy(); app = base["app"].copy()
-    ok_base = ((tot - soll_t)[lo:hi] >= 0).all() and ((app - soll_a)[lo:hi] >= 0).all()
+    ok_base = ((tot - soll_t)[lo:hi] >= 0).all()
     if not ok_base:
         return False
     def rec(i):
@@ -295,14 +296,11 @@ def stagger_feasible(m, window=120, step=15):
         n, grp, dur, starts = opts[i]
         for t in starts:
             tot[t:t + dur] -= 1
-            if grp == "approbiert": app[t:t + dur] -= 1
-            good = ((tot - soll_t)[lo:hi] >= 0).all() and ((app - soll_a)[lo:hi] >= 0).all()
+            good = ((tot - soll_t)[lo:hi] >= 0).all()
             if good and rec(i + 1):
                 tot[t:t + dur] += 1
-                if grp == "approbiert": app[t:t + dur] += 1
                 return True
             tot[t:t + dur] += 1
-            if grp == "approbiert": app[t:t + dur] += 1
         return False
     return rec(0)
 
@@ -313,7 +311,7 @@ def pause_issues(m, base=None):
     c0 = counts(m); c1 = counts(m, pauses=True)
     out = []
     for a, b, name, gs, ps in blocks_for(m.date):
-        for kind, key, soll in (("Gesamt", "tot", gs), ("Approbierte", "app", ps)):
+        for kind, key, soll in (("Gesamt", "tot", gs),):     # Approbierte in Pause zählen weiter (Entscheidung Behic)
             if soll == 0:
                 continue
             if c0[key][a:b].min() < soll:

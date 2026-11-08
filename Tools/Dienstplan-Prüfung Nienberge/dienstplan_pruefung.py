@@ -3,7 +3,7 @@
 
 Aufruf:
   python3 dienstplan_pruefung.py --monat 2026-12 --out Pruefung_2026-12.xlsx  woche1.pdf woche2.pdf ...
-  optional: --notdienst 2026-12-05,2026-12-19   --sondertage 12-24,12-31
+  optional: --notdienst 2026-11-30   (oder: --notdienst keine)   --sondertage 12-24,12-31
 """
 import argparse, json, sys, os, datetime as dt
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -18,11 +18,11 @@ def main():
     ap.add_argument("pdfs", nargs="+")
     ap.add_argument("--monat", required=True, help="Prüfmonat JJJJ-MM")
     ap.add_argument("--out", required=True)
-    ap.add_argument("--notdienst", default="")
+    ap.add_argument("--notdienst", default=None, help="Notdiensttermine JJJJ-MM-TT,... oder 'keine'; weggelassen = Termine unbekannt (offen)")
     ap.add_argument("--sondertage", default=",".join(SONDERTAGE_DEFAULT))
     a = ap.parse_args()
     weeks = [parse_pdf(p) for p in a.pdfs]
-    nd = [x for x in a.notdienst.split(",") if x]
+    nd = None if a.notdienst is None else [x for x in a.notdienst.split(",") if x and x != "keine"]
     A = analyze(weeks, notdienst=nd, sondertage=[x for x in a.sondertage.split(",") if x], monat=a.monat)
     y, m = a.monat.split("-")
     titel = f"{MONATE[int(m)]} {y}"
