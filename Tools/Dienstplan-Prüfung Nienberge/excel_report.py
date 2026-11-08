@@ -214,7 +214,7 @@ def write_report(A, path, titel, quelle_text):
             elif nd["gaps"]: put(wsK, r, 8, "nicht erfüllt: Lücke " + ", ".join(rng(a, b) for a, b in nd["gaps"]), RED)
             else:
                 ps = []
-                for n, a, b in sorted(nd["persons"], key=lambda x: x[1]): ps.append(f"{short(n)} {fmt(a % M)}–{fmt(b % M if b % M else M)}")
+                for n, a, b in sorted(nd["persons"], key=lambda x: x[1]): ps.append(f"{short(n)} {fmt(a % M)}–" + ("23:59" if b == M else fmt(b % M if b % M else M)))
                 put(wsK, r, 8, "durchgehend gedeckt\n" + "\n".join(ps), "A9D18E")
         else:
             put(wsK, r, 8, "entfällt", NEUT)
@@ -301,7 +301,7 @@ def write_report(A, path, titel, quelle_text):
     wsC.merge_cells("A2:I2")
     wsC["A2"] = ("Nur Prüfkandidaten, keine Zusage. Rechnerisch geprüft: Gesamt- und Approbiertenbesetzung je Zeitblock, Auf-/Abschließen, KBO 10/16 Uhr, Labor Mo/Mi/Fr (Berufsgruppe der Person berücksichtigt). "
                  "Nicht berücksichtigt: Notdienst (Tage mit Notdienst werden ausgelassen), tatsächliche Pausenstaffelung, persönliche Umstände. Eine rosa Gesamtbesetzung allein bedeutet nicht, dass jede Person frei bekommen kann. "
-                 "Gezeigt werden Tage ohne bestätigte Unterbesetzung, ohne unsichere Anrechnung, ohne möglichen Notdienst-Abschnitt (über Mitternacht) und mit erfüllten Zusatzprüfungen; bei Tagen mit Notdienst-Verdacht werden keine Kürzungen vorgeschlagen (Notdienst ungeklärt).")
+                 "Gezeigt werden Tage ohne bestätigte Unterbesetzung, ohne unsichere Anrechnung, ohne Notdienst (Notdienstdatum und Folgetag) und mit erfüllten Zusatzprüfungen. An Notdiensttagen werden keine Kürzungen vorgeschlagen. Abschnitte über Mitternacht ohne bekannten Notdienst werden ebenfalls ausgelassen.")
     wsC["A2"].alignment = WRAP; wsC.row_dimensions[2].height = 62
     head(wsC, 4, ["Datum", "Tag", "Person", "Berufsgruppe", "Dienst (Bereich)", "Ganzer Dienst", "Später beginnen möglich bis", "Früher enden möglich ab", "Hinweise"])
     wsC.freeze_panes = "A5"
@@ -433,6 +433,7 @@ def write_overview(wb, ws, A, titel, quelle_text):
         f"Nicht erfüllte Zusatzprüfungen: KBO-Prüfzeitpunkte {kbo_rot}×, Labor-Pflicht {lab_rot}× (Details: Blatt „Detail Engpässe“, Abschnitt 1b).",
         f"Pausenabstimmung erforderlich an {len({d for d, x in A['pausen']})} Tagen (Richtzeit-Pausen würden gleichzeitig unter das Soll fallen; keine feste Unterbesetzung)." + (" Nicht abdeckbar auch bei freier Staffelung: " + ", ".join(sorted({d.strftime('%d.%m.') for d, x in A['pausen'] if not x.get('staffelbar', True)})) + "." if any(not x.get("staffelbar", True) for d, x in A["pausen"]) else ""),
         "Zeiträume ohne Personalreserve (Gesamtbesetzung genau Soll), häufigste Zeitblöcke: " + ", ".join(f"{k} ({v}×)" for k, v in ys.most_common(4)) + ".",
+        ("Notdienst: " + ", ".join(dstr(x) for x in A["notdienst_termine"]) + " – 09:00 bis 09:00 Folgetag lückenlos mit Approbierten besetzt (Blatt KBO-Labor-Notdienst)." if A["notdienst_bekannt"] and A["notdienst_termine"] and all(not A.get("notdienst", {}).get(x, {"gaps": [1]})["gaps"] for x in A["notdienst_termine"]) else "Notdienst: Prüfergebnis siehe Blatt KBO-Labor-Notdienst." if A["notdienst_bekannt"] else "Notdienstprüfung offen – Termine fehlen."),
         "Erhöhte Personalreserve (Gesamtbesetzung ≥ Soll + 3): " + (", ".join(f"{k} ({v}×)" for k, v in pk.most_common(4)) if pk else "keine") + ". Konkrete Freistellungsmöglichkeiten: Blatt „Prüfkandidaten“.",
     ]
     for t in lines:
@@ -440,7 +441,7 @@ def write_overview(wb, ws, A, titel, quelle_text):
         ws.row_dimensions[r].height = 16 * (1 + len(t) // 120); r += 1
     r += 1
     banner(ws, r, "Offene Fragen", 5, GREY, True, 12); r += 1
-    qs = ["Notdienstprüfung offen – Termine fehlen." if not A["notdienst_bekannt"] else "Notdiensttermine berücksichtigt: " + (", ".join(dstr(x) for x in A["notdienst_termine"]) or "keine") + " (Blatt KBO-Labor-Notdienst).",
+    qs = (["Notdienstprüfung offen – Termine fehlen."] if not A["notdienst_bekannt"] else []) + [
           "Notdienste 2027: Termine werden später mitgeteilt (letzter Notdienst 2026 war 30.11. auf 01.12.).",
           "24.12. und 31.12.: Sonderregel (08:00–13:00, immer 3 Personen) wird von dir manuell geprüft."]
     qs += [f"{o[0]}: {o[1]}" for o in A["offen"] if "Mitternacht" in o[1]][:2]
@@ -458,7 +459,7 @@ def write_overview(wb, ws, A, titel, quelle_text):
     for c, t in ((RED, "0 approbierte Personen"), (LGR, "1"), (DGR, "2"), (PINK, "3 oder mehr"), (NEUT, "nicht erforderlich (z. B. Aufschließen) bzw. entfällt")):
         leg(c, t, r); r += 1
     ws.cell(r, 1, "Zusatzprüfungen (KBO, Labor, Notdienst)").font = BOLD; r += 1
-    for c, t in (("A9D18E", "erfüllt"), (RED, "nicht erfüllt"), (GREY, "nicht eindeutig prüfbar (fehlende/unklare Angaben, Feiertag, offen)"), (NEUT, "entfällt / manuell zu prüfen (Sonderregel)")):
+    for c, t in (("A9D18E", "erfüllt"), (RED, "nicht erfüllt"), (GREY, "nicht eindeutig prüfbar (fehlende/unklare Angaben, offen)"), (NEUT, "entfällt / manuell zu prüfen (Sonderregel)")):
         leg(c, t, r); r += 1
     r += 1
     banner(ws, r, "Prüfgrundlagen und Annahmen", 5, BAND, True, 12); r += 1
@@ -470,7 +471,7 @@ def write_overview(wb, ws, A, titel, quelle_text):
            "Samstag 09:00–13:00: genau 3 Personen (mind. und max. 3); mehr gilt als Mangel (Überbesetzung). Feiertage laut Export: Apotheke geschlossen, nicht geprüft. Tage nach dem Prüfmonat werden vorerst nicht geprüft.",
            "Abschnitte „bis 23:59“ und „ab 00:00“ (Mitternachtsgrenze des Exports) gelten als lückenlos.",
            "Die Pausenprüfung ist ein rechnerisches Szenario (alle Pausen zur Richtzeit) und leitet daraus keine feste Unterbesetzung ab.",
-           "Prüfmonat und Wochenreste: Alle Tage der gelieferten Wochen werden geprüft; Tage außerhalb des Prüfmonats sind markiert."]
+           "Prüfmonat und Wochenreste: Der Prüfmonat und der Wochenrest davor (kursiv grau) werden geprüft; Tage nach dem Prüfmonat werden vorerst nicht geprüft."]
     for t in ann:
         ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=5); x = ws.cell(r, 1, "•  " + t); x.alignment = WRAP; ws.row_dimensions[r].height = 16 * (1 + len(t) // 120); r += 1
     r += 1
