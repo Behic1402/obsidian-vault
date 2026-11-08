@@ -68,5 +68,10 @@ Zukünftige Wochen = Soll, aktuelle/vergangene evtl. Ist → Hinweis auf Mischun
 - Prüfkandidaten für Überstundenabbau/Freistellung: Berufsgruppe, KBO, Labor, Auf-/Abschließen, Notdienst, Pausenverteilung beachten. Rosa allein heißt nicht „frei möglich"; Zeitabschnitts-Reserve von ganztägiger Freistellung unterscheiden.
 - Optimierungsvorschläge zur Prüfdatei willkommen, aber die festgelegten Regeln nicht ändern.
 
+## Nutzung (Behic, 2026-11-08)
+- **Monatlicher Ablauf:** Einmal im Monat werden die 4–5 Wochenexporte (ApoCollect) für den **darauffolgenden Monat** hochgeladen und geprüft.
+- Dezember 2026 dient als Beispiel/Testfall. Ziel: wiederverwendbares Werkzeug/Skill, Regeln bleiben unverändert.
+- Pro Lauf zusätzlich nötig: Notdiensttermine des Monats.
+
 ## Stand
 - 2026-11-08: Regeln aufgenommen. **Exportdateien fehlen noch** (nicht in der Sitzung angekommen), Notdiensttermine fehlen ebenfalls.
