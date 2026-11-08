@@ -52,6 +52,10 @@ Exportierte ApoCollect-Dienstpläne der Jahreszeiten Apotheke Nienberge gegen di
 ## Notdienst
 Termine kommen separat. Je Termin 09:00 bis 09:00 Folgetag durchgehend mind. 1 Approbierte; lückenlose Übergaben ok; reguläre Besetzung gilt zusätzlich; keine Doppelzählung. Ohne Liste: „Notdienstprüfung offen – Termine fehlen". Termine nie erfinden.
 
+## Sonderregel 24.12. und 31.12. (Behic, 2026-11-08)
+- Heiligabend (24.12.) und Silvester (31.12.): Öffnung nur 08:00–13:00, es müssen immer nur **3 Personen** anwesend sein.
+- **Vorerst von der automatischen Prüfung ausgenommen**, Behic prüft diese beiden Tage manuell. In der Prüfdatei nur neutral als „manuell geprüft (Sonderregel)" kennzeichnen, nicht bewerten.
+
 ## Soll/Ist
 Zukünftige Wochen = Soll, aktuelle/vergangene evtl. Ist → Hinweis auf Mischung, nichts rekonstruieren oder runden.
 
