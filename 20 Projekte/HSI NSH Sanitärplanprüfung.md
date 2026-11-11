@@ -8,7 +8,7 @@ aliases:
   - NSH
   - Hauptschule Ibbenbüren
 erstellt: 2026-11-03
-aktualisiert: 2026-11-10
+aktualisiert: 2026-11-11
 ---
 
 # HSI / NSH – Sanitärplanprüfung
@@ -21,3 +21,4 @@ aktualisiert: 2026-11-10
 - Bauherr Stadt Ibbenbüren, Neubau Hauptschule + Ersatzneubau Sporthalle; Submission 05.10.2026, Zuschlagskriterium niedrigster Preis, 8 Bieter.
 - Vergabeempfehlung von Behic (TIGEV, Stand 10.11.2026) empfiehlt KERKHOFF Gebäudetechnik GmbH, Hörstel-Riesenbeck, 346.992,12 € netto (inkl. 4 Jahre Wartung).
 - 2026-11-10: Vergabeempfehlung auf Rechtschreibung/Formulierung geprüft (Word mit Änderungsverfolgung). Offene inhaltliche Punkte: Status Hollinden (ausgeschlossen vs. Rang 2), fehlende Unterschrift Bolte, Eignungsnachweise Vechta, Nachforderung Kerkhoff vs. Bolte vertauscht, Versicherungsnachweise > 3 Monate.
+- 2026-11-11: Angebot Kerkhoff (LV-Nr. 10260519, 416 Positionen, 181 Seiten) rechnerisch geprüft und vollständig mit grünen Haken (ME, EP, GP) markiert; Menge × EP = GP, alle Titelsummen, Nettosumme 346.992,12 €, MwSt und Endbetrag 412.920,62 € ohne Abweichung.
