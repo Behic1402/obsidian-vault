@@ -22,3 +22,4 @@ aktualisiert: 2026-11-11
 - Vergabeempfehlung von Behic (TIGEV, Stand 10.11.2026) empfiehlt KERKHOFF Gebäudetechnik GmbH, Hörstel-Riesenbeck, 346.992,12 € netto (inkl. 4 Jahre Wartung).
 - 2026-11-10: Vergabeempfehlung auf Rechtschreibung/Formulierung geprüft (Word mit Änderungsverfolgung). Offene inhaltliche Punkte: Status Hollinden (ausgeschlossen vs. Rang 2), fehlende Unterschrift Bolte, Eignungsnachweise Vechta, Nachforderung Kerkhoff vs. Bolte vertauscht, Versicherungsnachweise > 3 Monate.
 - 2026-11-11: Angebot Kerkhoff (LV-Nr. 10260519, 416 Positionen, 181 Seiten) rechnerisch geprüft und vollständig mit grünen Haken (ME, EP, GP) markiert; Menge × EP = GP, alle Titelsummen, Nettosumme 346.992,12 €, MwSt und Endbetrag 412.920,62 € ohne Abweichung.
+- 2026-11-11: Zweites Kerkhoff-LV (AN 10260520, Abgabe LV Sanitär, 427 Positionen, 191 Seiten) ebenso geprüft und abgehakt; keine Rechenfehler, Nettosumme 421.832,04 €, MwSt 80.148,09 €, Endbetrag 501.980,13 €.
