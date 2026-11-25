@@ -8,7 +8,7 @@ aliases:
   - NSH
   - Hauptschule Ibbenbüren
 erstellt: 2026-11-03
-aktualisiert: 2026-11-12
+aktualisiert: 2026-11-25
 ---
 
 # HSI / NSH – Sanitärplanprüfung
@@ -25,3 +25,4 @@ aktualisiert: 2026-11-12
 - 2026-11-11: Zweites Kerkhoff-LV (AN 10260520, Abgabe LV Sanitär, 427 Positionen, 191 Seiten) ebenso geprüft und abgehakt; keine Rechenfehler, Nettosumme 421.832,04 €, MwSt 80.148,09 €, Endbetrag 501.980,13 €.
 - 2026-11-11: Kerkhoff-LV Heizung (AN 10260521, 210 Positionen, 106 Seiten) ebenso geprüft und abgehakt; keine Rechenfehler, Nettosumme 436.163,16 €, MwSt 82.871,00 €, Endbetrag 519.034,16 € (deckt sich mit HSI_400.03-Empfehlung inkl. Wartung).
 - 2026-11-12: Kerkhoff-LV Heizung Neubau Sporthalle (AN 10260522, 183 Positionen, 92 Seiten) geprüft und abgehakt; keine Rechenfehler, Nettosumme 248.137,98 €, MwSt 47.146,22 €, Endbetrag 295.284,20 €.
+- 2026-11-25: Angebot Rönne-Technik A26-0567 Lüftungstechnik NB Sporthalle (186 Positionen, 120 Seiten) geprüft und abgehakt; keine Rechenfehler, Nettosumme 525.875,69 €, MwSt 99.916,38 €, Endbetrag 625.792,07 €.
