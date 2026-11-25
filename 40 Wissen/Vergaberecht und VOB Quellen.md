@@ -34,6 +34,12 @@ Recherche vom 2026-11-25: Wo kommt Claude an den Wortlaut von Vergaberecht und V
 - NRW-Kommunen: seit 01.01.2026 unterschwellig keine Pflicht mehr zu VOB/A/UVgO (§ 75a GO NRW), es gilt die eigene Vergabesatzung der Kommune. Land NRW: Freihändige Vergabe mit Teilnahmewettbewerb seit 01.10.2026 bis zur EU-Schwelle.
 - ATV: DIN 18299 (allgemein), 18381 (Gas/Wasser/Entwässerung), 18380 (Heizung/WW), 18379 (RLT), 18421 (Dämmung techn. Anlagen).
 
+## Abweichendes Angebot (z. B. falsches Lüftungsgerät in einer Position)
+- Nach der Öffnung keine Änderung von Inhalt oder Preis: § 15 Abs. 3 VOB/A (Nachverhandlungsverbot). Ausnahme nur bei Nebenangeboten oder Leistungsprogramm.
+- Aufklärung (§ 15 Abs. 1) ist erlaubt, um zu klären, was angeboten wurde, aber nicht, um es zu ändern.
+- Weicht das Angebot von den Vergabeunterlagen ab: § 13 Abs. 1 Nr. 5, dann zwingender Ausschluss nach § 16 Abs. 1 Nr. 2. Eine Bagatellgrenze gibt es nicht.
+- Vorab prüfen: Sind die Unterlagen eindeutig? Gilt „oder gleichwertig“? Ist es ein Nebenangebot? Wer ist Auftraggeber (NRW-Kommune → Vergabesatzung)?
+
 ## Verknüpfungen
 - [[Claude-Skills für HOAI und TGA]]
 - [[Eigene Claude-Skills TGA]]
